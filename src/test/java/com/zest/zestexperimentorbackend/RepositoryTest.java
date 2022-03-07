@@ -3,7 +3,7 @@ package com.zest.zestexperimentorbackend;
 import com.zest.zestexperimentorbackend.Entities.QuestionChoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.Entities.QuestionChoices.MultipleTextChoice;
 import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
-import com.zest.zestexperimentorbackend.Entities.QuestionMedias.TextQuestionMedia;
+import com.zest.zestexperimentorbackend.Entities.QuestionMedias.TextMedia;
 import com.zest.zestexperimentorbackend.Entities.Questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.Entities.Questions.DemographicQuestion;
 import com.zest.zestexperimentorbackend.Repositories.QuestionRepository;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,26 +26,28 @@ public class RepositoryTest {
 
     private BaseQuestion getQuestion(){
         //@TODO Maybe Randomly generate some test questions for CRUD tests
-        QuestionMedia media = new TextQuestionMedia("Who is the number one beauty in Milan?");
+        QuestionMedia media = new TextMedia("Who is the number one beauty in Milan?");
         QuestionChoice choices = new MultipleTextChoice(Arrays.asList("A. Yuxi Liu","B. Yuanhao Zhu","C. Siqian Huang"));
         return new DemographicQuestion(media, BaseQuestion.QuestionType.MULTI_CHOICE,choices,"BeautyMilan");
     }
 
     @Test
     public void repoCreate() throws Exception{
-        questionRepository.deleteAll();
+        //questionRepository.deleteAll();
         BaseQuestion q = getQuestion();
+        q.setId("62263767c9feff2a21500b95");
+        q.setAlias("Changed Alias");
         BaseQuestion returned = questionRepository.save(q);
+
+        assertEquals(q,returned);
+        assertEquals(q,returned);
+        assertEquals(q,returned);
         assertEquals(q,returned);
     }
 
     @Test
     public void repoSearch() throws Exception{
-        List<BaseQuestion> q = questionRepository.findAllByAliasContains("Beauty");
-        for(BaseQuestion qe : q){
-            log.info(qe.toString());
-        }
+        questionRepository.findAll().forEach(q -> log.info(q.toString()));
     }
-
     //More test on every entity
 }

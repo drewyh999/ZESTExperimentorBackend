@@ -6,6 +6,7 @@ import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -30,9 +31,5 @@ public abstract class BaseQuestion {
         this.questionType = questionType;
         this.choice = choice;
         this.alias = alias;
-    }
-
-    public BaseQuestion(){
-
     }
 }

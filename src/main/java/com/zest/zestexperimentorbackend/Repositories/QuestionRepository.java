@@ -9,4 +9,5 @@ import java.util.List;
 public interface QuestionRepository extends MongoRepository<BaseQuestion,String> {
     BaseQuestion findByAliasIs(String alias);
     List<BaseQuestion> findAllByAliasContains(String alias);
+    List<BaseQuestion> findAllByChoiceExists();
 }
