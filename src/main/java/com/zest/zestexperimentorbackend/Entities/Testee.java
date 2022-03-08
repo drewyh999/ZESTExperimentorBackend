@@ -18,7 +18,10 @@ public class Testee {
     //the map of QuestionID to the answer text
     private Map<String, QuestionChoice> answerMap;
 
+    private String testGroup;
+
     public Testee(Map<String, QuestionChoice> answerMap) {
         this.answerMap = answerMap;
     }
 }
+
