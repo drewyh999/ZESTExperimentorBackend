@@ -1,6 +1,8 @@
 package com.zest.zestexperimentorbackend.Entities.Questions;
 
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.zest.zestexperimentorbackend.Entities.QuestionChoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
 import lombok.Data;
@@ -13,7 +15,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection="Questions")
 @Data
-public abstract class BaseQuestion {
+@JsonSubTypes(
+        {
+                @JsonSubTypes.Type(value = DemographicQuestion.class,name = "DemographicQuestion"),
+                @JsonSubTypes.Type(value = TimedQuestion.class, name = "TimedQuestion")
+        }
+)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+public class BaseQuestion {
     public enum QuestionType{MULTI_CHOICE,SINGLE_CHOICE,TEXT}
     @Id
     @EqualsAndHashCode.Exclude protected String id;
