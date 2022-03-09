@@ -1,14 +1,11 @@
 package com.zest.zestexperimentorbackend.Controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.zest.zestexperimentorbackend.Entities.Questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.Entities.Questions.DemographicQuestion;
 import com.zest.zestexperimentorbackend.Repositories.QuestionRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.zest.zestexperimentorbackend.Exceptions.QuestionNotFoundException;
 
@@ -31,13 +28,19 @@ public class QuestionController {
 
     @PostMapping("/questions")
     @ResponseStatus(HttpStatus.OK)
-    String addQuestion(@RequestBody List<BaseQuestion> questionList){
-        questionList.forEach(q -> log.info(q.toString()));
-        return "OK";
+    void addQuestion(@RequestBody List<BaseQuestion> questionList){
+        questionList.forEach(q -> log.info(q.getQuestionMedia().toString()));
+        questionRepository.saveAll(questionList);
     }
+
     @GetMapping("/questions/{id}")
     BaseQuestion experiment(@PathVariable String id){
         return questionRepository.findById(id).orElseThrow(() -> new QuestionNotFoundException(id));
     }
 
+    @DeleteMapping("/questions")
+    @ResponseStatus(HttpStatus.OK)
+    void deleteQuestion(@RequestBody List<String> questionIdList){
+        questionIdList.forEach(questionRepository::deleteById);
+    }
 }

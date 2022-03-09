@@ -1,4 +1,4 @@
 package com.zest.zestexperimentorbackend.Controllers;
 
-public class QuestionNotFoundAdvice {
+public class ScheduleController {
 }
