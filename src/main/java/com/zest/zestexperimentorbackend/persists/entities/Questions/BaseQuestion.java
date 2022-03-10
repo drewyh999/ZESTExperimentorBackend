@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
         }
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-public class BaseQuestion {
+public abstract class BaseQuestion {
     public enum QuestionType{MULTI_CHOICE,SINGLE_CHOICE,TEXT}
     @Id
     @EqualsAndHashCode.Exclude protected String id;
