@@ -1,6 +1,5 @@
 package com.zest.zestexperimentorbackend.Entities.Schedules;
 
-import com.zest.zestexperimentorbackend.Entities.Questions.BaseQuestion;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +8,7 @@ import java.util.List;
 
 @Document("Schedules")
 @Data
-public class BaseSchedule {
+public class Schedule {
     @Id
     private String id;
 
@@ -17,6 +16,6 @@ public class BaseSchedule {
 
     private String alias;
 
-    private List<String> questionIdList;
+    private List<ScheduleModule> scheduleModules;
 
 }

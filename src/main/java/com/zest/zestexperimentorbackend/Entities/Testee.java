@@ -10,7 +10,6 @@ import java.util.Map;
 
 @Document(collection = "Testees")
 @Data
-@EqualsAndHashCode
 public class Testee {
     @Id
     private String id;

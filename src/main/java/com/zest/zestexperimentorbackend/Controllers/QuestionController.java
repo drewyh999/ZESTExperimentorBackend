@@ -22,8 +22,13 @@ public class QuestionController {
     }
 
     @GetMapping("/questions")
-    List<BaseQuestion> allQuestions(){
-        return questionRepository.findAll();
+    List<BaseQuestion> allQuestions(@RequestParam(value="alias", defaultValue = "") String alias){
+        if(alias.equals("")){
+            return questionRepository.findAll();
+        }
+        else{
+            return questionRepository.findAllByAliasContains(alias);
+        }
     }
 
     @PostMapping("/questions")
@@ -34,7 +39,7 @@ public class QuestionController {
     }
 
     @GetMapping("/questions/{id}")
-    BaseQuestion experiment(@PathVariable String id){
+    BaseQuestion getQuestion(@PathVariable String id){
         return questionRepository.findById(id).orElseThrow(() -> new QuestionNotFoundException(id));
     }
 
