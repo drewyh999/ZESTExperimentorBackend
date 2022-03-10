@@ -1,12 +1,12 @@
 package com.zest.zestexperimentorbackend;
 
-import com.zest.zestexperimentorbackend.Entities.QuestionChoices.QuestionChoice;
-import com.zest.zestexperimentorbackend.Entities.QuestionChoices.MultipleTextChoice;
-import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
-import com.zest.zestexperimentorbackend.Entities.QuestionMedias.TextMedia;
-import com.zest.zestexperimentorbackend.Entities.Questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.Entities.Questions.DemographicQuestion;
-import com.zest.zestexperimentorbackend.Repositories.QuestionRepository;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.QuestionChoice;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.MultipleTextChoice;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.QuestionMedia;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.TextMedia;
+import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.Questions.DemographicQuestion;
+import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;

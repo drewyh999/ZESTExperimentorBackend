@@ -1,14 +1,13 @@
-package com.zest.zestexperimentorbackend.Entities.Questions;
+package com.zest.zestexperimentorbackend.persists.entities.Questions;
 
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.zest.zestexperimentorbackend.Entities.QuestionChoices.QuestionChoice;
-import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.QuestionChoice;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.QuestionMedia;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 

@@ -1,6 +1,6 @@
 package com.zest.zestexperimentorbackend.Advices;
 
-import com.zest.zestexperimentorbackend.Exceptions.NotFoundExeption;
+import com.zest.zestexperimentorbackend.exceptions.NotFoundExeption;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

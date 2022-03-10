@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.Entities.QuestionMedias;
+package com.zest.zestexperimentorbackend.persists.entities.QuestionMedias;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;

@@ -1,8 +1,7 @@
-package com.zest.zestexperimentorbackend.Entities.Questions;
+package com.zest.zestexperimentorbackend.persists.entities.Questions;
 
-import com.zest.zestexperimentorbackend.Entities.QuestionChoices.QuestionChoice;
-import com.zest.zestexperimentorbackend.Entities.QuestionMedias.QuestionMedia;
-import lombok.Data;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.QuestionChoice;
+import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.QuestionMedia;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.data.annotation.TypeAlias;

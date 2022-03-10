@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.Entities.Schedules;
+package com.zest.zestexperimentorbackend.persists.entities.Schedules;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

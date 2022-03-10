@@ -1,10 +1,9 @@
 package com.zest.zestexperimentorbackend.Controllers;
 
 
-import com.zest.zestexperimentorbackend.Entities.Schedules.Schedule;
-import com.zest.zestexperimentorbackend.Exceptions.QuestionNotFoundException;
-import com.zest.zestexperimentorbackend.Exceptions.ScheduleNotFoundException;
-import com.zest.zestexperimentorbackend.Repositories.ScheduleRepository;
+import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;
+import com.zest.zestexperimentorbackend.exceptions.ScheduleNotFoundException;
+import com.zest.zestexperimentorbackend.persists.repositories.ScheduleRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

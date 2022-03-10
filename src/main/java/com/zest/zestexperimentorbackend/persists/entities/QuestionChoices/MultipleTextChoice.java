@@ -1,11 +1,9 @@
-package com.zest.zestexperimentorbackend.Entities.QuestionChoices;
+package com.zest.zestexperimentorbackend.persists.entities.QuestionChoices;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.annotation.TypeAlias;
 
 import java.util.List;
 

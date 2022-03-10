@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.Exceptions;
+package com.zest.zestexperimentorbackend.exceptions;
 
 
 //TODO Make the exceptions in hierarchy

@@ -1,6 +1,6 @@
-package com.zest.zestexperimentorbackend.Repositories;
+package com.zest.zestexperimentorbackend.persists.repositories;
 
-import com.zest.zestexperimentorbackend.Entities.Schedules.Schedule;
+import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

@@ -1,13 +1,13 @@
 package com.zest.zestexperimentorbackend.Controllers;
 
 
-import com.zest.zestexperimentorbackend.Entities.Questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.Repositories.QuestionRepository;
+import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.zest.zestexperimentorbackend.Exceptions.QuestionNotFoundException;
+import com.zest.zestexperimentorbackend.exceptions.QuestionNotFoundException;
 
 import java.util.List;
 
