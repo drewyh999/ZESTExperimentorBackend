@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.persists.entities.QuestionChoices;
+package com.zest.zestexperimentorbackend.persists.entities.questionchoices;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;

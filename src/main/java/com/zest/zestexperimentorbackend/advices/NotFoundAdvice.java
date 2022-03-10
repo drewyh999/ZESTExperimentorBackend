@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.Advices;
+package com.zest.zestexperimentorbackend.advices;
 
 import com.zest.zestexperimentorbackend.exceptions.NotFoundExeption;
 import org.springframework.http.HttpStatus;

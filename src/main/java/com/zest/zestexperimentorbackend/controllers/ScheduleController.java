@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.Controllers;
+package com.zest.zestexperimentorbackend.controllers;
 
 
 import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;

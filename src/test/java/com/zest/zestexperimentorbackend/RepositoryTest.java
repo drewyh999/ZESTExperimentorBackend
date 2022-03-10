@@ -1,9 +1,9 @@
 package com.zest.zestexperimentorbackend;
 
-import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.QuestionChoice;
-import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.MultipleTextChoice;
-import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.QuestionMedia;
-import com.zest.zestexperimentorbackend.persists.entities.QuestionMedias.TextMedia;
+import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
+import com.zest.zestexperimentorbackend.persists.entities.questionchoices.MultipleTextChoice;
+import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;
+import com.zest.zestexperimentorbackend.persists.entities.questionmedias.TextMedia;
 import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.Questions.DemographicQuestion;
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
@@ -33,7 +33,7 @@ public class RepositoryTest {
 
     @Test
     public void repoCreate() throws Exception{
-        //questionRepository.deleteAll();
+        questionRepository.deleteAll();
         BaseQuestion q = getQuestion();
         q.setId("62263767c9feff2a21500b95");
         q.setAlias("Changed Alias");

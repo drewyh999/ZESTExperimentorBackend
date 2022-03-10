@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.persists.entities.QuestionMedias;
+package com.zest.zestexperimentorbackend.persists.entities.questionmedias;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

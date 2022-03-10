@@ -1,6 +1,6 @@
 package com.zest.zestexperimentorbackend.persists.entities;
 
-import com.zest.zestexperimentorbackend.persists.entities.QuestionChoices.QuestionChoice;
+import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
