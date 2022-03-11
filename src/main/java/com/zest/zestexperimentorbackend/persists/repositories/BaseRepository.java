@@ -8,5 +8,4 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface BaseRepository<T> extends MongoRepository<T,String> {
-    List<T> findAllByAliasContains(String alias);
 }

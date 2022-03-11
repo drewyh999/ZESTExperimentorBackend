@@ -2,7 +2,6 @@ package com.zest.zestexperimentorbackend.controllers;
 
 
 import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;
-import com.zest.zestexperimentorbackend.exceptions.ScheduleNotFoundException;
 
 import com.zest.zestexperimentorbackend.services.ScheduleService;
 import org.springframework.http.HttpStatus;
@@ -19,9 +18,14 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @GetMapping("/schedules")
-    List<Schedule> allSchedules(@RequestParam(value="alias",defaultValue = "") String alias){
+    @GetMapping(value = "/schedules",params = "alias")
+    List<Schedule> getSchedulesByAlias(String alias){
         return scheduleService.getByAlias(alias);
+    }
+
+    @GetMapping("/schedules")
+    List<Schedule> allSchedules(){
+        return scheduleService.getAll();
     }
 
     @PostMapping("/schedules")

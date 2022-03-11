@@ -1,13 +1,10 @@
 package com.zest.zestexperimentorbackend.services;
 
 
-import com.zest.zestexperimentorbackend.exceptions.QuestionNotFoundException;
 import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.repositories.BaseRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,5 +18,9 @@ public class QuestionService extends BaseCrudService<BaseQuestion> {
 
     public List<BaseQuestion> getQuestionByType(BaseQuestion.QuestionType type){
         return ((QuestionRepository)repository).findAllByQuestionTypeIs(type);
+    }
+
+    public List<BaseQuestion> getByAlias(String alias){
+        return ((QuestionRepository)repository).findAllByAliasContains(alias);
     }
 }

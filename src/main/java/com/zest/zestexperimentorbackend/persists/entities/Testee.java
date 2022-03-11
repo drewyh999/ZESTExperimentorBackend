@@ -13,13 +13,12 @@ public class Testee {
     @Id
     private String id;
 
-    //the map of QuestionID to the answer text
-    private Map<String, QuestionChoice> answerMap;
+    private Map<String, String> answerMap;
 
     private String testGroup;
 
-    public Testee(Map<String, QuestionChoice> answerMap) {
-        this.answerMap = answerMap;
+    public Testee(String testGroup) {
+        this.testGroup = testGroup;
     }
 }
 

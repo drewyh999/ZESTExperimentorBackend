@@ -9,11 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-//TODO Abstract the service layer
 @RestController
 public class QuestionController {
-
-    private static final Log log = LogFactory.getLog(QuestionController.class);
 
     private final QuestionService questionService;
 
@@ -21,9 +18,19 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/questions")
-    List<BaseQuestion> allQuestions(@RequestParam(value="alias", defaultValue = "") String alias){
+    @GetMapping(value = "/questions",params = "alias")
+    List<BaseQuestion> getQuestionByAlias(String alias){
         return questionService.getByAlias(alias);
+    }
+
+    @GetMapping(value = "/questions",params = "questiontype")
+    List<BaseQuestion> getQuestionByQuestionType(BaseQuestion.QuestionType type){
+        return questionService.getQuestionByType(type);
+    }
+
+    @GetMapping("/questions")
+    List<BaseQuestion> allQuestions(){
+        return questionService.getAll();
     }
 
     @PostMapping("/questions")

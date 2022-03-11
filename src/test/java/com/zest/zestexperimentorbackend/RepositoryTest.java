@@ -1,5 +1,6 @@
 package com.zest.zestexperimentorbackend;
 
+import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.MultipleTextChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;
@@ -38,7 +39,8 @@ public class RepositoryTest {
         q.setId("62263767c9feff2a21500b95");
         q.setAlias("Changed Alias");
         BaseQuestion returned = questionRepository.save(q);
-
+        Testee testee = new Testee("ABS");
+        log.info(testee.getId());
         assertEquals(q,returned);
         assertEquals(q,returned);
         assertEquals(q,returned);
