@@ -15,7 +15,6 @@ import java.util.List;
 }
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-
 public class Schedule {
     @Id
     private String id;

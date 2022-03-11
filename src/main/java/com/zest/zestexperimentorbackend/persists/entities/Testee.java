@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Document(collection = "Testees")
@@ -19,6 +20,7 @@ public class Testee {
 
     public Testee(String testGroup) {
         this.testGroup = testGroup;
+        this.answerMap = new HashMap<>();
     }
 }
 

@@ -33,7 +33,11 @@ public class ExperimentService {
             //Assign the new testee to a random test group
             List<Schedule> schedule_list = scheduleService.getAll();
             Random random = new Random(session.getCreationTime());
-            int group_index = random.nextInt(schedule_list.size() - 1);
+            int group_index = 0;
+            if(schedule_list.size() != 1) {
+                group_index = random.nextInt(schedule_list.size() - 1);
+            }
+
             Schedule assigned_schedule = schedule_list.get(group_index);
             session.setAttribute("schedule_id",assigned_schedule.getId());
             session.setAttribute("question_index",0);
