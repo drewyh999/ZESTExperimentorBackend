@@ -1,7 +1,7 @@
 package com.zest.zestexperimentorbackend.services;
 
 
-import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.repositories.BaseRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

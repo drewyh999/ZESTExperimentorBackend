@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.persists.entities.Schedules;
+package com.zest.zestexperimentorbackend.persists.entities.schedules;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -16,6 +16,7 @@ import java.util.List;
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 public class Schedule {
+    public enum ScheduleType{EXPERIMENT,PILOT}
     @Id
     private String id;
 
@@ -23,6 +24,8 @@ public class Schedule {
 
     private String alias;
 
-    private List<String> questionIdList;
+    private ScheduleType scheduleType;
+
+    private List<ScheduleModule> scheduleModuleList;
 
 }

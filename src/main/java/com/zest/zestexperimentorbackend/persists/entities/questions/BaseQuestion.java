@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.persists.entities.Questions;
+package com.zest.zestexperimentorbackend.persists.entities.questions;
 
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;

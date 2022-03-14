@@ -1,13 +1,11 @@
 package com.zest.zestexperimentorbackend;
 
-import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;
-import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.MultipleTextChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.TextMedia;
-import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.persists.entities.Questions.DemographicQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.DemographicQuestion;
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.ScheduleRepository;
 import org.apache.commons.logging.Log;
@@ -16,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

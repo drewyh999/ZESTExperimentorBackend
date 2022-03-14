@@ -1,10 +1,8 @@
 package com.zest.zestexperimentorbackend.controllers;
 
 
-import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.services.QuestionService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

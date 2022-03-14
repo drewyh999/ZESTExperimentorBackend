@@ -1,4 +1,4 @@
-package com.zest.zestexperimentorbackend.persists.entities.Questions;
+package com.zest.zestexperimentorbackend.persists.entities.questions;
 
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;

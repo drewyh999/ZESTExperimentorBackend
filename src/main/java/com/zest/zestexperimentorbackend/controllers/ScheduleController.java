@@ -1,7 +1,7 @@
 package com.zest.zestexperimentorbackend.controllers;
 
 
-import com.zest.zestexperimentorbackend.persists.entities.Schedules.Schedule;
+import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 
 import com.zest.zestexperimentorbackend.services.ScheduleService;
 import org.springframework.http.HttpStatus;

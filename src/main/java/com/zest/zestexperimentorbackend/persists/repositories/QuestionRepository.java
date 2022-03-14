@@ -1,7 +1,6 @@
 package com.zest.zestexperimentorbackend.persists.repositories;
 
-import com.zest.zestexperimentorbackend.persists.entities.Questions.BaseQuestion;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 
 import java.util.List;
 
