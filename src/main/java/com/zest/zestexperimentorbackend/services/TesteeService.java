@@ -11,4 +11,8 @@ public class TesteeService extends BaseCrudService<Testee>{
     public TesteeService(@Qualifier("testeeRepository") BaseRepository<Testee> repository) {
         super(repository);
     }
+
+    public void csvFile(){
+
+    }
 }

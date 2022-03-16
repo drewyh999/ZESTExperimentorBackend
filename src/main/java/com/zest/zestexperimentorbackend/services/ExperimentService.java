@@ -86,7 +86,7 @@ public class ExperimentService {
                     .get(current_question_index + 1));
         }
         //If current module finished, continue on next module
-        else if(current_module_index < current_module_list.size()){
+        else if(current_module_index < current_module_list.size() - 1){
             session.setAttribute("question_index",0);
             session.setAttribute("module_index",current_module_index + 1);
             return questionService.findById(schedule.getScheduleModuleList().get(current_module_index + 1)

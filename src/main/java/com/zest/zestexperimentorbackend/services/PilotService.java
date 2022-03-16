@@ -35,9 +35,16 @@ public class PilotService extends ExperimentService{
             // Save the current answer
             //If the current answer is null(Cannot tell) then we start to count consecutive、
 
-            int stop_count = (int)session.getAttribute("stop_count");
-            if(ans.equals("Can’t tell")){
+            String current_question_id = current_schedule_module.getQuestionIdList().get(current_question_index);
+            testee.getAnswerMap().put(current_question_id,ans);
+            testeeService.saveOne(testee);
+            int stop_count = -1;
+            if(session.getAttribute("stop_count") != null){
+                stop_count = (int)session.getAttribute("stop_count");
+            }
+            if(ans.equals("Cannot tell")){
                 stop_count ++;
+                session.setAttribute("stop_count",stop_count);
             }
             else{
                 session.setAttribute("stop_count",0);
@@ -45,12 +52,11 @@ public class PilotService extends ExperimentService{
             if(stop_count >= ((EarlyStoppingSchedule)schedule).getStoppingCount()){
                 session.setAttribute("question_index",0);
                 session.setAttribute("module_index",current_module_index + 1);
+                session.removeAttribute("stop_count");
                 return questionService.findById(schedule.getScheduleModuleList().get(current_module_index + 1)
                         .getQuestionIdList().get(0));
             }
-            String current_question_id = current_schedule_module.getQuestionIdList().get(current_question_index);
-            testee.getAnswerMap().put(current_question_id,ans);
-            testeeService.saveOne(testee);
+
 
             // Return next question and next question index if the experiment is not completed
 
@@ -62,7 +68,7 @@ public class PilotService extends ExperimentService{
                         .get(current_question_index + 1));
             }
             //If current module finished, continue on next module
-            else if(current_module_index < current_module_list.size()){
+            else if(current_module_index < current_module_list.size() - 1){
                 session.setAttribute("question_index",0);
                 session.setAttribute("module_index",current_module_index + 1);
                 return questionService.findById(schedule.getScheduleModuleList().get(current_module_index + 1)
