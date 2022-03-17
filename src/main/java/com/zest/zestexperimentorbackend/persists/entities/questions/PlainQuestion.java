@@ -10,8 +10,8 @@ import org.springframework.data.annotation.TypeAlias;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TypeAlias("DemoQuest")
-public class DemographicQuestion extends BaseQuestion{
-    public DemographicQuestion(QuestionMedia questionMedia, QuestionType questionType, QuestionChoice choice, String alias) {
+public class PlainQuestion extends BaseQuestion{
+    public PlainQuestion(QuestionMedia questionMedia, QuestionType questionType, QuestionChoice choice, String alias) {
         super(questionMedia, questionType, choice, alias);
     }
 }

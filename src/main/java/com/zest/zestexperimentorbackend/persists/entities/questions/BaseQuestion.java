@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(value = DemographicQuestion.class,name = "DemographicQuestion"),
+                @JsonSubTypes.Type(value = PlainQuestion.class,name = "DemographicQuestion"),
                 @JsonSubTypes.Type(value = TimedQuestion.class, name = "TimedQuestion")
         }
 )

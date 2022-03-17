@@ -16,11 +16,15 @@ public class Testee {
 
     private Map<String, String> answerMap;
 
+    private Map<String,Long> timeMap;
+
     private String testGroup;
 
     public Testee(String testGroup) {
         this.testGroup = testGroup;
         this.answerMap = new HashMap<>();
+        this.timeMap = new HashMap<>();
     }
+
 }
 

@@ -36,7 +36,7 @@ public class ScheduleController {
 
     @GetMapping("/schedules/{id}")
     Schedule getSchedule(@PathVariable String id){
-        return scheduleService.findById(id);
+        return scheduleService.getById(id);
     }
 
     @DeleteMapping("/schedule/{id}")

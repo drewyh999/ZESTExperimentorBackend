@@ -16,7 +16,7 @@ public class PilotController {
     }
 
     @GetMapping("/pilot")
-    public BaseQuestion runPilot(HttpSession session,String ans){
-        return pilotService.runPilot(session,ans);
+    public BaseQuestion runPilot(HttpSession session,String ans,Long timeSpent){
+        return pilotService.runPilot(session,ans,timeSpent);
     }
 }

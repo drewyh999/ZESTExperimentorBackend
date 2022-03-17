@@ -39,7 +39,7 @@ public class QuestionController {
 
     @GetMapping("/questions/{id}")
     BaseQuestion getQuestion(@PathVariable String id){
-        return questionService.findById(id);
+        return questionService.getById(id);
     }
 
     @DeleteMapping("/questions/{id}")

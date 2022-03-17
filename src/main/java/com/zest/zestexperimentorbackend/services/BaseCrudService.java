@@ -20,7 +20,7 @@ public class BaseCrudService<T>{
         return repository.save(item);
     }
 
-    public T findById(String id){
+    public T getById(String id){
         return repository.findById(id).orElseThrow(() -> new BaseNotFoundExeption(id,repository.getClass().toString()));
     }
 

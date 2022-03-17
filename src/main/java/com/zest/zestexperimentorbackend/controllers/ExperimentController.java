@@ -17,7 +17,7 @@ public class ExperimentController {
     }
 
     @GetMapping("/experiment")
-    BaseQuestion runExperiment(HttpSession session, String ans){
-        return experimentService.runExperiment(session,ans);
+    BaseQuestion runExperiment(HttpSession session, String ans, Long timeSpent){
+        return experimentService.runExperiment(session,ans,timeSpent);
     }
 }
