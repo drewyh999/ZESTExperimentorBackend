@@ -25,7 +25,6 @@ public class CSVService {
 
     TesteeService testeeService;
 
-
     public CSVService(QuestionService questionService, TesteeService testeeService) {
         this.questionService = questionService;
         this.testeeService = testeeService;
@@ -47,7 +46,10 @@ public class CSVService {
         List<String> alias_list = new ArrayList<>();
         alias_list.add("id");
         alias_list.add("TestGroup");
-        questionList.forEach(q -> alias_list.add(q.getAlias()));
+        for(var question: questionList){
+            alias_list.add(question.getAlias());
+            alias_list.add(question.getAlias() + "_time");
+        }
 
         CSVPrinter csvPrinter = new CSVPrinter(servletResponse.getWriter(), CSVFormat.DEFAULT);
         //Print headers
@@ -58,7 +60,10 @@ public class CSVService {
             List<String> record = new ArrayList<>();
             record.add(testee.getId());
             record.add(testee.getTestGroup());
-            testee.getAnswerMap().forEach((k,v) -> record.add(v));
+            for(var entry: testee.getAnswerMap().entrySet()){
+                record.add(entry.getValue());
+                record.add(testee.getTimeMap().get(entry.getKey()).toString());
+            }
             csvPrinter.printRecord(record);
         }
     }
