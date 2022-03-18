@@ -38,7 +38,6 @@ public class RepositoryTest {
     private static final Log log = LogFactory.getLog(RepositoryTest.class);
 
     private BaseQuestion getQuestion(){
-        //@TODO Maybe Randomly generate some test questions for CRUD tests
         QuestionMedia media = new TextMedia("Who is the number one beauty in Milan?");
         QuestionChoice choices = new MultipleTextChoice(Arrays.asList("A. Yuxi Liu","B. Yuanhao Zhu","C. Siqian Huang"));
         return new PlainQuestion(media, BaseQuestion.QuestionType.MULTI_CHOICE,choices,"BeautyMilan");

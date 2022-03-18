@@ -3,6 +3,7 @@ package com.zest.zestexperimentorbackend.services;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.TimedQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.EarlyStoppingSchedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModule;
@@ -26,10 +27,12 @@ public class PilotService extends ExperimentService{
         if(session.isNew()){
             String question_id = setUp(session, Schedule.ScheduleType.PILOT);
             session.setAttribute("stop_count",0);
-            return questionService.getById(question_id);
+            var selectedQuestion =  questionService.getById(question_id);
+            //Starts with a question that has infinite exposure time
+            ((TimedQuestion)selectedQuestion).setExposureTime(-1);
+            return selectedQuestion;
         }
         else{
-            //TODO Exposure time Decreasing
             //Continue the answering
             AnswerStateCache answerStateCache = cacheService.getById(session.getId());
             Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
@@ -75,8 +78,23 @@ public class PilotService extends ExperimentService{
                 answerStateCache.setQuestionIndex(current_question_index + 1);
                 answerStateCache.setModuleIndex(current_module_index);
                 cacheService.saveOne(answerStateCache);
-                return questionService.getById(current_schedule_module.getQuestionIdList()
+                var selectedQuestion = questionService.getById(current_schedule_module.getQuestionIdList()
                         .get(current_question_index + 1));
+                //If we are in the Timed question module, we need to decrease the exposure time by 10 seconds till 1 second
+                // every time
+                if(current_module_index == 0){
+                    /*
+                    * Starts from 1 minutes and decrease, since in the continuing answering part, the question index
+                    * should be more than 0, so as the requirement stated, we should start from  infinite exposure time
+                    * and then 1 min of exposure time then decrease 10 seconds each time, so we only need to decrease
+                    * 60000ms which is 1 min by the distance between current question index and index 1, */
+
+                    long newExposureTime = Math.max(60000 - current_question_index * 10L,100);
+
+                    //Set the new exposure time
+                    ((TimedQuestion)selectedQuestion).setExposureTime(newExposureTime);
+                }
+                return selectedQuestion;
             }
             //If current module finished, continue on next module
             else if(current_module_index < current_module_list.size() - 1){

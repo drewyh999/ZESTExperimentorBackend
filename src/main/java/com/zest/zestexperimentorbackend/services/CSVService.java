@@ -54,15 +54,15 @@ public class CSVService {
         CSVPrinter csvPrinter = new CSVPrinter(servletResponse.getWriter(), CSVFormat.DEFAULT);
         //Print headers
         csvPrinter.printRecord(alias_list);
-        //TODO Get answer map printed as it should be
-        //TODO Export reaction time to the csv file
         for(Testee testee: testeeList){
             List<String> record = new ArrayList<>();
             record.add(testee.getId());
             record.add(testee.getTestGroup());
             for(var entry: testee.getAnswerMap().entrySet()){
                 record.add(entry.getValue());
-                record.add(testee.getTimeMap().get(entry.getKey()).toString());
+                //Only record those question with time requirement
+                if(testee.getTimeMap().get(entry.getKey()) != null)
+                    record.add(testee.getTimeMap().get(entry.getKey()).toString());
             }
             csvPrinter.printRecord(record);
         }
