@@ -16,15 +16,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(value = PlainQuestion.class,name = "DemographicQuestion"),
-                @JsonSubTypes.Type(value = TimedQuestion.class, name = "TimedQuestion")
+                @JsonSubTypes.Type(value = PlainQuestion.class),
+                @JsonSubTypes.Type(value = TimedQuestion.class)
         }
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+/*
+* Make sure to add subtype info above if wish to extend more questions, and make sure to add @Data annotation to the
+* extended subclass so that jackson could serialize into subtypes properly*/
 public abstract class BaseQuestion {
     public enum QuestionType{MULTI_CHOICE,SINGLE_CHOICE,TEXT}
     @Id
-    @EqualsAndHashCode.Exclude protected String id;
+    protected String id;
 
     protected QuestionMedia questionMedia;
 
@@ -34,10 +37,5 @@ public abstract class BaseQuestion {
 
     protected String alias;
 
-    public BaseQuestion(QuestionMedia questionMedia, QuestionType questionType, QuestionChoice choice, String alias) {
-        this.questionMedia = questionMedia;
-        this.questionType = questionType;
-        this.choice = choice;
-        this.alias = alias;
-    }
+
 }

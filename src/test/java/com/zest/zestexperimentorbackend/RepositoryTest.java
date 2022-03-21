@@ -1,11 +1,14 @@
 package com.zest.zestexperimentorbackend;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionchoices.MultipleTextChoice;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;
 import com.zest.zestexperimentorbackend.persists.entities.questionmedias.TextMedia;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.questions.PlainQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.TimedQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.EarlyStoppingSchedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModule;
@@ -38,9 +41,10 @@ public class RepositoryTest {
     private static final Log log = LogFactory.getLog(RepositoryTest.class);
 
     private BaseQuestion getQuestion(){
-        QuestionMedia media = new TextMedia("Who is the number one beauty in Milan?");
-        QuestionChoice choices = new MultipleTextChoice(Arrays.asList("A. Yuxi Liu","B. Yuanhao Zhu","C. Siqian Huang"));
-        return new PlainQuestion(media, BaseQuestion.QuestionType.MULTI_CHOICE,choices,"BeautyMilan");
+//        QuestionMedia media = new TextMedia("Who is the number one beauty in Milan?");
+//        QuestionChoice choices = new MultipleTextChoice(Arrays.asList("A. Yuxi Liu","B. Yuanhao Zhu","C. Siqian Huang"));
+//        return new PlainQuestion(media, BaseQuestion.QuestionType.MULTI_CHOICE,choices,"BeautyMilan");
+        return null;
     }
 
     @Test
@@ -68,6 +72,17 @@ public class RepositoryTest {
     @Test
     public void repoSearch() throws Exception{
         testeeRepository.deleteAll();
+    }
+
+    @Test
+    public void repoDelete() throws Exception{
+        questionRepository.deleteAll();
+    }
+    @Test
+    public void polySerialization() throws Exception{
+        var mapper = new ObjectMapper();
+        BaseQuestion q = questionRepository.findById("622bcd4c63bfe04aa02ff514").orElseThrow();
+        log.info(mapper.writeValueAsString(((TimedQuestion)q)));
     }
     //More test on every entity
 }

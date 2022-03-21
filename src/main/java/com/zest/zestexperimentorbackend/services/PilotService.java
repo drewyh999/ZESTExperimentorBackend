@@ -89,7 +89,7 @@ public class PilotService extends ExperimentService{
                     * and then 1 min of exposure time then decrease 10 seconds each time, so we only need to decrease
                     * 60000ms which is 1 min by the distance between current question index and index 1, */
 
-                    long newExposureTime = Math.max(60000 - current_question_index * 10L,100);
+                    long newExposureTime = Math.max(60000 - current_question_index * 10000L,100);
 
                     //Set the new exposure time
                     ((TimedQuestion)selectedQuestion).setExposureTime(newExposureTime);
