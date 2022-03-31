@@ -3,21 +3,19 @@ package com.zest.zestexperimentorbackend.persists.entities.questions;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.zest.zestexperimentorbackend.persists.entities.questionchoices.QuestionChoice;
-import com.zest.zestexperimentorbackend.persists.entities.questionmedias.QuestionMedia;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 
 
 @Document(collection="Questions")
 @Data
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(value = PlainQuestion.class),
-                @JsonSubTypes.Type(value = TimedQuestion.class)
+                @JsonSubTypes.Type(value = DemographicQuestion.class),
+                @JsonSubTypes.Type(value = CodeEvaluation.class)
         }
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
@@ -29,11 +27,11 @@ public abstract class BaseQuestion {
     @Id
     protected String id;
 
-    protected QuestionMedia questionMedia;
+    protected String questionText;
 
     protected QuestionType questionType;
 
-    protected QuestionChoice choice;
+    protected List<String> questionChoices;
 
     protected String alias;
 

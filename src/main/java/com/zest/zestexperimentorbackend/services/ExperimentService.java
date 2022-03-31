@@ -1,5 +1,6 @@
 package com.zest.zestexperimentorbackend.services;
 
+import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
 import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
@@ -8,6 +9,7 @@ import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModu
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -29,28 +31,55 @@ public class ExperimentService {
         this.cacheService = cacheService;
     }
 
-    public BaseQuestion runExperiment(HttpSession session, String ans,Long time){
+    //TODO Return the result in an object which could contain one or more response
+    public List<BaseQuestion> runExperiment(HttpSession session, List<Answer> answerList){
         // Schedule -> List of Modules in the schedule -> List of question id in the module
         if(session.isNew()){
             String question_id = setUp(session, Schedule.ScheduleType.EXPERIMENT);
-            return questionService.getById(question_id);
+            return List.of(questionService.getById(question_id));
         }
         else{
-            return continueAnswering(session,ans,time);
+            return continueAnswering(session,answerList);
         }
     }
 
     Testee setUpTestee(Testee testee, Schedule assigned_schedule){
         for(int i = 0;i < assigned_schedule.getScheduleModuleList().size();i ++){
-            for(int j = 0;j < assigned_schedule.getScheduleModuleList().get(i).getQuestionIdList().size();j ++){
+            for(int j = 0; j < assigned_schedule.getScheduleModuleList().get(i).getQuestionIdList().size(); j ++){
                 String init_id = assigned_schedule.getScheduleModuleList().get(i).getQuestionIdList().get(j);
-                testee.getAnswerMap().put(init_id,null);
-                testee.getTimeMap().put(init_id,null);
+                testee.getAnswerList().add(new Answer(init_id));
             }
         }
         return testee;
     }
 
+    List<BaseQuestion> getQuestionsByCacheInfo(AnswerStateCache answerStateCache, int questionIndex, int moduleIndex){
+        int currentModuleIndex = answerStateCache.getModuleIndex();
+        Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
+
+        //If we are moving on to the different module, we should update the current question ID list including shuffle it
+        if(moduleIndex != currentModuleIndex){
+            List<String> newModuleQuestionIdList = schedule.getScheduleModuleList().get(moduleIndex).getQuestionIdList();
+            Collections.shuffle(newModuleQuestionIdList);
+            answerStateCache.setCurrentModuleQuestionIDList(newModuleQuestionIdList);
+        }
+
+        //Update current question index and the module index
+        answerStateCache.setQuestionIndex(questionIndex);
+        answerStateCache.setModuleIndex(moduleIndex);
+
+        //Save the cached states
+        cacheService.saveOne(answerStateCache);
+
+        //We should return all the question if the current module is a demographic question module
+        if(schedule.getScheduleModuleList().get(answerStateCache.getModuleIndex()).getModuleType() == ScheduleModule.ModuleType.DEMO){
+            return questionService.getByIdList(answerStateCache.getCurrentModuleQuestionIDList());
+        }
+        //Or return single item when dealing with other type of module
+        else{
+            return List.of(questionService.getById(answerStateCache.getCurrentModuleQuestionIDList().get(questionIndex)));
+        }
+    }
     //Set up the first session and return ID of the first question
     String setUp(HttpSession session, Schedule.ScheduleType type){
         //Assign the new testee to a random test group(each schedule could represent a test group)
@@ -63,23 +92,27 @@ public class ExperimentService {
         Schedule assigned_schedule = schedule_list.get(group_index);
 
         //create a new testee
-        String type_string = type.toString().toLowerCase(Locale.ROOT);
-        Testee testee = new Testee(type_string +"-"+ assigned_schedule.getTestGroup());
+        String ScheduleTypeString = type.toString().toLowerCase(Locale.ROOT);
+        Testee testee = new Testee(ScheduleTypeString +"-"+ assigned_schedule.getTestGroup());
 
         //Initialize the answer map with null
         testee = setUpTestee(testee,assigned_schedule);
         Testee saved_testee = testeeService.saveOne(testee);
 
+        //Initialize the module and shuffle the question order so that random access could be achieved
+        List<String> ModuleQuestionIDList = assigned_schedule.getScheduleModuleList().get(0).getQuestionIdList();
+        Collections.shuffle(ModuleQuestionIDList,random);
+
         //Create new cache object to store in redis
         AnswerStateCache answerStateCache = new AnswerStateCache(session.getId(),0,0
-                ,saved_testee.getId(),assigned_schedule.getId());
+                ,saved_testee.getId(), assigned_schedule.getId(), ModuleQuestionIDList);
 
         cacheService.saveOne(answerStateCache);
 
         return assigned_schedule.getScheduleModuleList().get(0).getQuestionIdList().get(0);
     }
 
-    BaseQuestion continueAnswering(HttpSession session, String ans,Long timeSpent){
+    List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList){
         //Continue the answering
         AnswerStateCache answerStateCache = cacheService.getById(session.getId());
         Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
@@ -89,29 +122,24 @@ public class ExperimentService {
         int current_module_index = answerStateCache.getModuleIndex();
         ScheduleModule current_schedule_module = current_module_list.get(current_module_index);
 
+        //If no answer is provided, then the user is refreshing or coming back after closing the tab in the browser
+        if(answerList.size() == 0){
+            return getQuestionsByCacheInfo(answerStateCache,current_question_index,current_module_index);
+        }
+
         // Save the current answer and time it takes
-        String current_question_id = current_schedule_module.getQuestionIdList().get(current_question_index);
-        testee.getAnswerMap().put(current_question_id,ans);
-        testee.getTimeMap().put(current_question_id,timeSpent);
+        testee.getAnswerList().addAll(answerList);
         testeeService.saveOne(testee);
 
         // Return next question and next question index if the experiment is not completed
 
         //If current module is not finished, continue on current module
         if(current_question_index < current_schedule_module.getQuestionIdList().size() - 1){
-            answerStateCache.setQuestionIndex(current_question_index + 1);
-            answerStateCache.setModuleIndex(current_module_index);
-            cacheService.saveOne(answerStateCache);
-            return questionService.getById(current_schedule_module.getQuestionIdList()
-                    .get(current_question_index + 1));
+            return getQuestionsByCacheInfo(answerStateCache,current_question_index + 1,current_module_index);
         }
         //If current module finished, continue on next module
         else if(current_module_index < current_module_list.size() - 1){
-            answerStateCache.setQuestionIndex(0);
-            answerStateCache.setModuleIndex(current_module_index + 1);
-            cacheService.saveOne(answerStateCache);
-            return questionService.getById(schedule.getScheduleModuleList().get(current_module_index + 1)
-                    .getQuestionIdList().get(0));
+            return getQuestionsByCacheInfo(answerStateCache,0,current_module_index + 1);
         }
         // Return null if the whole experiment is over
         else{

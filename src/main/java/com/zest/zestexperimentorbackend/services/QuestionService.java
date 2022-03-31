@@ -28,7 +28,7 @@ public class QuestionService extends BaseCrudService<BaseQuestion> {
         return ((QuestionRepository)repository).findAllByAliasContains(alias);
     }
 
-    public List<BaseQuestion> getByIdList(Set<String> keySet) throws BaseNotFoundExeption{
+    public List<BaseQuestion> getByIdList(List<String> keySet) throws BaseNotFoundExeption{
         List<BaseQuestion> result = new ArrayList<>();
         for(String key : keySet){
             result.add((repository).findById(key).orElseThrow(() -> new BaseNotFoundExeption(key,"Basequesion")));

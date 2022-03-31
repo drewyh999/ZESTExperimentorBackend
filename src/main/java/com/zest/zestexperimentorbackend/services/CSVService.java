@@ -37,32 +37,38 @@ public class CSVService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         String localtimestring = dateTimeFormatter.format(dateTime);
 
+        //Deal with file name and content type
         servletResponse.addHeader("Content-Disposition","attachment; filename=" + "experiment-result-export"
                 +localtimestring + ".csv");
         List<Testee> testeeList = testeeService.findByTestGroupContains(mode);
-        List<BaseQuestion> questionList = questionService.getByIdList(testeeList.get(0).getAnswerMap().keySet());
 
-        //Get alias of the problem
-        List<String> alias_list = new ArrayList<>();
-        alias_list.add("id");
-        alias_list.add("TestGroup");
+        //Create list of all questions which will be used as headers of the csv file
+        List<String> questionIdList = new ArrayList<>();
+        testeeList.get(0).getAnswerList().forEach(a -> questionIdList.add(a.getQuestionID()));
+        List<BaseQuestion> questionList = questionService.getByIdList(questionIdList);
+
+        //Get alias of the problem and use them as the csv file header
+        List<String> csvHeaderList = new ArrayList<>();
+        csvHeaderList.add("id");
+        csvHeaderList.add("TestGroup");
         for(var question: questionList){
-            alias_list.add(question.getAlias());
-            alias_list.add(question.getAlias() + "_time");
+            csvHeaderList.add(question.getAlias());
+            csvHeaderList.add(question.getAlias() + "_time");
         }
 
         CSVPrinter csvPrinter = new CSVPrinter(servletResponse.getWriter(), CSVFormat.DEFAULT);
+
         //Print headers
-        csvPrinter.printRecord(alias_list);
+        csvPrinter.printRecord(csvHeaderList);
         for(Testee testee: testeeList){
             List<String> record = new ArrayList<>();
             record.add(testee.getId());
             record.add(testee.getTestGroup());
-            for(var entry: testee.getAnswerMap().entrySet()){
-                record.add(entry.getValue());
-                //Only record those question with time requirement
-                if(testee.getTimeMap().get(entry.getKey()) != null)
-                    record.add(testee.getTimeMap().get(entry.getKey()).toString());
+            for(var entry: testee.getAnswerList()){
+                record.add(entry.getAnswerText());
+                //Only print those question with time requirement
+                if(entry.getTimeSpent() != null)
+                    record.add(entry.getTimeSpent().toString());
             }
             csvPrinter.printRecord(record);
         }

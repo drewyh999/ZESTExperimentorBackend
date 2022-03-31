@@ -1,9 +1,10 @@
 package com.zest.zestexperimentorbackend.services;
 
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
+import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
 import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.persists.entities.questions.TimedQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.questions.CodeEvaluation;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.EarlyStoppingSchedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModule;
@@ -16,36 +17,42 @@ import java.util.List;
 
 @Service
 public class PilotService extends ExperimentService{
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public PilotService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
         super(questionService, scheduleService, testeeService, cacheService);
     }
-
-    public BaseQuestion runPilot(HttpSession session, String ans, Long timeSpent){
-        logger.info("Received time spent on the question" + timeSpent);
+    //TODO Change experiment use as well
+    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList){
         if(session.isNew()){
             String question_id = setUp(session, Schedule.ScheduleType.PILOT);
             session.setAttribute("stop_count",0);
             var selectedQuestion =  questionService.getById(question_id);
             //Starts with a question that has infinite exposure time
-            ((TimedQuestion)selectedQuestion).setExposureTime(-1);
-            return selectedQuestion;
+            ((CodeEvaluation)selectedQuestion).setExposureTime(-1);
+            return List.of(selectedQuestion);
         }
         else{
             //Continue the answering
             AnswerStateCache answerStateCache = cacheService.getById(session.getId());
             Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
-            List<ScheduleModule> current_module_list = schedule.getScheduleModuleList();
+            List<ScheduleModule> currentModuleList = schedule.getScheduleModuleList();
             Testee testee = testeeService.getById(answerStateCache.getTesteeId());
             int current_question_index = answerStateCache.getQuestionIndex();
             int current_module_index = answerStateCache.getModuleIndex();
-            ScheduleModule current_schedule_module = current_module_list.get(current_module_index);
+            ScheduleModule current_schedule_module = currentModuleList.get(current_module_index);
 
-            // Save the current answer
-            String current_question_id = current_schedule_module.getQuestionIdList().get(current_question_index);
-            testee.getAnswerMap().put(current_question_id,ans);
-            testee.getTimeMap().put(current_question_id,timeSpent);
+            //If the answer list is empty then the user is refreshing the page or comeback from closing a tab
+            if(answerList.size() == 0){
+                long newExposureTime = current_question_index == 0 ? -1 :Math.max(60000 - current_question_index * 10000L,100);
+
+                var selectedQuestion = questionService.getById(current_schedule_module.getQuestionIdList()
+                        .get(current_question_index));
+
+                ((CodeEvaluation)selectedQuestion).setExposureTime(newExposureTime);
+                return List.of(selectedQuestion);
+            }
+
+            testee.getAnswerList().addAll(answerList);
             testeeService.saveOne(testee);
 
             //If the current answer is null(Cannot tell) then we start to count consecutive、
@@ -54,7 +61,7 @@ public class PilotService extends ExperimentService{
                 stop_count = (int)session.getAttribute("stop_count");
             }
             //TODO make the stopping string as config
-            if(ans.equals("Cannot tell")){
+            if(answerList.get(0).getAnswerText().equals("Cannot tell")){
                 stop_count ++;
                 session.setAttribute("stop_count",stop_count);
             }
@@ -62,14 +69,11 @@ public class PilotService extends ExperimentService{
                 session.setAttribute("stop_count",0);
             }
             if(stop_count >= ((EarlyStoppingSchedule)schedule).getStoppingCount()){
-                answerStateCache.setQuestionIndex(0);
-                answerStateCache.setModuleIndex(current_module_index + 1);
-                cacheService.saveOne(answerStateCache);
                 session.removeAttribute("stop_count");
-                return questionService.getById(schedule.getScheduleModuleList().get(current_module_index + 1)
-                        .getQuestionIdList().get(0));
+                return getQuestionsByCacheInfo(answerStateCache,0,current_module_index + 1);
             }
 
+            //TODO Shuffle the question id list when entering the next module
 
             // Return next question and next question index if the experiment is not completed
 
@@ -92,17 +96,13 @@ public class PilotService extends ExperimentService{
                     long newExposureTime = Math.max(60000 - current_question_index * 10000L,100);
 
                     //Set the new exposure time
-                    ((TimedQuestion)selectedQuestion).setExposureTime(newExposureTime);
+                    ((CodeEvaluation)selectedQuestion).setExposureTime(newExposureTime);
                 }
-                return selectedQuestion;
+                return List.of(selectedQuestion);
             }
             //If current module finished, continue on next module
-            else if(current_module_index < current_module_list.size() - 1){
-                answerStateCache.setQuestionIndex(0);
-                answerStateCache.setModuleIndex(current_module_index + 1);
-                cacheService.saveOne(answerStateCache);
-                return questionService.getById(schedule.getScheduleModuleList().get(current_module_index + 1)
-                        .getQuestionIdList().get(0));
+            else if(current_module_index < currentModuleList.size() - 1){
+                return getQuestionsByCacheInfo(answerStateCache,0,current_module_index + 1);
             }
             // Return null if the whole experiment is over
             else{
@@ -112,4 +112,6 @@ public class PilotService extends ExperimentService{
             }
         }
     }
+
+
 }
