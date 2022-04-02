@@ -21,4 +21,8 @@ public class Answer {
         this.answerText = answerText;
         this.timeSpent = timeSpent;
     }
+
+    public Answer(){
+
+    }
 }

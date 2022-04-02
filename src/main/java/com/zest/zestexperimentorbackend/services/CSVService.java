@@ -5,19 +5,15 @@ import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Writer;
-import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class CSVService {
@@ -40,11 +36,17 @@ public class CSVService {
         //Deal with file name and content type
         servletResponse.addHeader("Content-Disposition","attachment; filename=" + "experiment-result-export"
                 +localtimestring + ".csv");
-        List<Testee> testeeList = testeeService.findByTestGroupContains(mode);
+        Stream<Testee> testeeStream = testeeService.findByTestGroupContains(mode);
+
+        //If nobody had taken the test yet. we return 404
+        if(testeeStream.findFirst().isPresent()){
+            servletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         //Create list of all questions which will be used as headers of the csv file
         List<String> questionIdList = new ArrayList<>();
-        testeeList.get(0).getAnswerList().forEach(a -> questionIdList.add(a.getQuestionID()));
+        testeeStream.findFirst().get().getAnswerMap().forEach((k,v) -> questionIdList.add(k));
         List<BaseQuestion> questionList = questionService.getByIdList(questionIdList);
 
         //Get alias of the problem and use them as the csv file header
@@ -60,17 +62,21 @@ public class CSVService {
 
         //Print headers
         csvPrinter.printRecord(csvHeaderList);
-        for(Testee testee: testeeList){
-            List<String> record = new ArrayList<>();
-            record.add(testee.getId());
-            record.add(testee.getTestGroup());
-            for(var entry: testee.getAnswerList()){
-                record.add(entry.getAnswerText());
-                //Only print those question with time requirement
-                if(entry.getTimeSpent() != null)
-                    record.add(entry.getTimeSpent().toString());
+        testeeStream.forEach(testee -> {
+                    List<String> record = new ArrayList<>();
+                    record.add(testee.getId());
+                    record.add(testee.getTestGroup());
+                    for (var entry : testee.getAnswerMap().entrySet()) {
+                        record.add(entry.getValue().getAnswerText());
+                        //Only print those question with time requirement
+                        if (entry.getValue().getTimeSpent() != null)
+                            record.add(entry.getValue().getTimeSpent().toString());
+                    }
+            try {
+                csvPrinter.printRecord(record);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            csvPrinter.printRecord(record);
-        }
+        });
     }
 }

@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Stream;
+
+
 
 @Service
 public class TesteeService extends BaseCrudService<Testee>{
@@ -14,7 +17,14 @@ public class TesteeService extends BaseCrudService<Testee>{
         super(repository);
     }
 
-    public List<Testee> findByTestGroupContains(String testgroupString){
+    public Stream<Testee> findByTestGroupContains(String testgroupString){
         return ((TesteeRepository)repository).findAllByTestGroupContains(testgroupString);
+    }
+
+    public long findAmountByIsFinishing(Boolean finished){
+        if(finished == null){
+            return ((TesteeRepository)repository).findAllBy().count();
+        }
+        return ((TesteeRepository)repository).findAllByFinishedIs(finished).count();
     }
 }

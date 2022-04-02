@@ -1,6 +1,7 @@
 package com.zest.zestexperimentorbackend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.questions.DemographicQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.questions.CodeEvaluation;
@@ -16,10 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
@@ -39,27 +38,42 @@ public class RepositoryTest {
 
     @Test
     public void repoCreate() throws Exception{
-//        scheduleRepository.deleteAll();
-//        Schedule schedule = new EarlyStoppingSchedule(2);
-//        schedule.setScheduleType(Schedule.ScheduleType.PILOT);
-//        schedule.setAlias("Test");
-//        schedule.setTestGroup("testgroup");
-//        Map<String,> questionIdList = new ArrayList<>();
-//        questionIdList.add("62263767c9feff2a21500b95");
-//        questionIdList.add("622bcd4963bfe04aa02ff513");
-//        questionIdList.add("622bcd4c63bfe04aa02ff514");
-//        ScheduleModule module_1 = new ScheduleModule(questionIdList);
-//        module_1.setModuleType(ScheduleModule.ModuleType.CODE);
-//        ScheduleModule module_2 = new ScheduleModule(questionIdList);
-//        module_2.setModuleType(ScheduleModule.ModuleType.CODE);
-//        ScheduleModule module_3 = new ScheduleModule(questionIdList);
-//        module_3.setModuleType(ScheduleModule.ModuleType.DEMO);
-//        List<ScheduleModule> moduleList = new ArrayList<>();
-//        moduleList.add(module_1);
-//        moduleList.add(module_2);
-//        moduleList.add(module_3);
-//        schedule.setScheduleModuleList(moduleList);
-//        scheduleRepository.save(schedule);
+        scheduleRepository.deleteAll();
+        Schedule schedule = new EarlyStoppingSchedule(2);
+        schedule.setScheduleType(Schedule.ScheduleType.PILOT);
+        schedule.setAlias("Test");
+        schedule.setTestGroup("testgroup");
+        List<String> questionIdList = new ArrayList<>();
+        questionIdList.add("62263767c9feff2a21500b95");
+        questionIdList.add("622bcd4963bfe04aa02ff513");
+        questionIdList.add("622bcd4c63bfe04aa02ff514");
+        ScheduleModule module_1 = new ScheduleModule(questionIdList);
+        module_1.setModuleType(ScheduleModule.ModuleType.CODE);
+        ScheduleModule module_2 = new ScheduleModule(questionIdList);
+        module_2.setModuleType(ScheduleModule.ModuleType.CODE);
+        ScheduleModule module_3 = new ScheduleModule(questionIdList);
+        module_3.setModuleType(ScheduleModule.ModuleType.DEMO);
+        List<ScheduleModule> moduleList = new ArrayList<>();
+        moduleList.add(module_1);
+        moduleList.add(module_2);
+        moduleList.add(module_3);
+        schedule.setScheduleModuleList(moduleList);
+        scheduleRepository.save(schedule);
+    }
+    @Test
+    public void shuffleList() throws Exception{
+        List<String> questionIdList = new ArrayList<>();
+        questionIdList.add("62263767c9feff2a21500b95");
+        questionIdList.add("622bcd4963bfe04aa02ff513");
+        questionIdList.add("622bcd4c63bfe04aa02ff514");
+        log.info(questionIdList);
+        AnswerStateCache answerStateCache = new AnswerStateCache();
+        Collections.shuffle(questionIdList, new Random(System.currentTimeMillis()));
+        log.info(questionIdList);
+
+        answerStateCache.setCurrentModuleQuestionIDList(questionIdList);
+        log.info(answerStateCache.getCurrentModuleQuestionIDList());
+
     }
 
     @Test

@@ -30,4 +30,6 @@ public class AnswerStateCache {
         this.scheduleId = scheduleId;
         this.currentModuleQuestionIDList = currentModuleQuestionIDList;
     }
+
+    public AnswerStateCache(){}
 }

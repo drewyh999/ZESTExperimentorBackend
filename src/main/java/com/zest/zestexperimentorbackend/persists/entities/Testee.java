@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Document(collection = "Testees")
@@ -16,7 +15,7 @@ public class Testee {
     @Id
     private String id;
 
-    private List<Answer> answerList;
+    private Map<String, Answer> answerMap;
 
     private String testGroup;
 
@@ -24,7 +23,7 @@ public class Testee {
 
     public Testee(String testGroup) {
         this.testGroup = testGroup;
-        this.answerList = new ArrayList<>();
+        this.answerMap = new HashMap<>();
         this.finished = false;
     }
 

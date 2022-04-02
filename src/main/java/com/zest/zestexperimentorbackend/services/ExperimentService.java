@@ -31,7 +31,6 @@ public class ExperimentService {
         this.cacheService = cacheService;
     }
 
-    //TODO Return the result in an object which could contain one or more response
     public List<BaseQuestion> runExperiment(HttpSession session, List<Answer> answerList){
         // Schedule -> List of Modules in the schedule -> List of question id in the module
         if(session.isNew()){
@@ -43,16 +42,33 @@ public class ExperimentService {
         }
     }
 
+    /**
+     * Initialize the testee objects with all the questionIDs and null
+     *
+     * @param testee the testee to be setup
+     * @param assigned_schedule the schedule that this testee is assigned to
+     * @return the testee that has been initialized
+     */
     Testee setUpTestee(Testee testee, Schedule assigned_schedule){
         for(int i = 0;i < assigned_schedule.getScheduleModuleList().size();i ++){
             for(int j = 0; j < assigned_schedule.getScheduleModuleList().get(i).getQuestionIdList().size(); j ++){
                 String init_id = assigned_schedule.getScheduleModuleList().get(i).getQuestionIdList().get(j);
-                testee.getAnswerList().add(new Answer(init_id));
+                testee.getAnswerMap().put(init_id,null);
             }
         }
         return testee;
     }
 
+
+    /**
+     * Get one question or a list of questions base on the question index/ module index given and the current
+     * answer state cache. Note that the requested question/questions should not only rely on the requested question index
+     * and module index but also on the relative position between the requested question and the current state
+     * @param answerStateCache the cache object indicating the current situation
+     * @param questionIndex the question index of the requested question
+     * @param moduleIndex the module index of the requested question
+     * @return the requested question/questions
+     */
     List<BaseQuestion> getQuestionsByCacheInfo(AnswerStateCache answerStateCache, int questionIndex, int moduleIndex){
         int currentModuleIndex = answerStateCache.getModuleIndex();
         Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
@@ -60,7 +76,7 @@ public class ExperimentService {
         //If we are moving on to the different module, we should update the current question ID list including shuffle it
         if(moduleIndex != currentModuleIndex){
             List<String> newModuleQuestionIdList = schedule.getScheduleModuleList().get(moduleIndex).getQuestionIdList();
-            Collections.shuffle(newModuleQuestionIdList);
+            Collections.shuffle(newModuleQuestionIdList,new Random(System.currentTimeMillis()));
             answerStateCache.setCurrentModuleQuestionIDList(newModuleQuestionIdList);
         }
 
@@ -80,6 +96,7 @@ public class ExperimentService {
             return List.of(questionService.getById(answerStateCache.getCurrentModuleQuestionIDList().get(questionIndex)));
         }
     }
+
     //Set up the first session and return ID of the first question
     String setUp(HttpSession session, Schedule.ScheduleType type){
         //Assign the new testee to a random test group(each schedule could represent a test group)
@@ -128,7 +145,9 @@ public class ExperimentService {
         }
 
         // Save the current answer and time it takes
-        testee.getAnswerList().addAll(answerList);
+        for(var answer : answerList){
+            testee.getAnswerMap().put(answer.getQuestionID(),answer);
+        }
         testeeService.saveOne(testee);
 
         // Return next question and next question index if the experiment is not completed
@@ -141,8 +160,10 @@ public class ExperimentService {
         else if(current_module_index < current_module_list.size() - 1){
             return getQuestionsByCacheInfo(answerStateCache,0,current_module_index + 1);
         }
-        // Return null if the whole experiment is over
+        // Return null if the whole experiment is over and mark the testee as the one that finished the test
         else{
+            testee.setFinished(true);
+            testeeService.saveOne(testee);
             cacheService.deleteById(session.getId());
             session.invalidate();
             return null;
