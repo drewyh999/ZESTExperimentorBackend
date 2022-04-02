@@ -6,7 +6,6 @@ import com.zest.zestexperimentorbackend.persists.repositories.TesteeRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 
@@ -17,11 +16,11 @@ public class TesteeService extends BaseCrudService<Testee>{
         super(repository);
     }
 
-    public Stream<Testee> findByTestGroupContains(String testgroupString){
+    public Stream<Testee> getByTestGroupContains(String testgroupString){
         return ((TesteeRepository)repository).findAllByTestGroupContains(testgroupString);
     }
 
-    public long findAmountByIsFinishing(Boolean finished){
+    public long getAmountByIsFinishing(Boolean finished){
         if(finished == null){
             return ((TesteeRepository)repository).findAllBy().count();
         }

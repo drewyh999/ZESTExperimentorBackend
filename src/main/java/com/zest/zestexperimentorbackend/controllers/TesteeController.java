@@ -14,6 +14,6 @@ public class TesteeController {
 
     @GetMapping(value = "/testees/amount",params = "finished")
     long getTesteeAmount(Boolean finished){
-        return testeeService.findAmountByIsFinishing(finished);
+        return testeeService.getAmountByIsFinishing(finished);
     }
 }

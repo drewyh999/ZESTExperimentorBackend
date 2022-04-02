@@ -36,7 +36,7 @@ public class CSVService {
         //Deal with file name and content type
         servletResponse.addHeader("Content-Disposition","attachment; filename=" + "experiment-result-export"
                 +localtimestring + ".csv");
-        Stream<Testee> testeeStream = testeeService.findByTestGroupContains(mode);
+        Stream<Testee> testeeStream = testeeService.getByTestGroupContains(mode);
 
         //If nobody had taken the test yet. we return 404
         if(testeeStream.findFirst().isPresent()){
