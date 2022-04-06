@@ -26,4 +26,8 @@ public class TesteeService extends BaseCrudService<Testee>{
         }
         return ((TesteeRepository)repository).findAllByFinishedIs(finished).count();
     }
+
+    public boolean ifAnyParticipants(String mode){
+        return this.getByTestGroupContains(mode).findAny().isPresent();
+    }
 }

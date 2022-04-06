@@ -1,6 +1,7 @@
 package com.zest.zestexperimentorbackend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.questions.DemographicQuestion;
@@ -11,6 +12,7 @@ import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModu
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.ScheduleRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.TesteeRepository;
+import com.zest.zestexperimentorbackend.services.TesteeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
@@ -33,6 +36,9 @@ public class RepositoryTest {
 
     @Autowired
     private TesteeRepository testeeRepository;
+
+    @Autowired
+    TesteeService testeeService;
 
     private static final Log log = LogFactory.getLog(RepositoryTest.class);
 
@@ -79,13 +85,15 @@ public class RepositoryTest {
     @Test
     public void repoSearch() throws Exception{
         testeeRepository.deleteAll();
-        questionRepository.deleteAll();
-        scheduleRepository.deleteAll();
+//        questionRepository.deleteAll();
+//        scheduleRepository.deleteAll();
     }
 
     @Test
     public void repoDelete() throws Exception{
 
+        Stream<Testee> testeeStream = testeeService.getByTestGroupContains("pilot");
+        log.info(testeeStream.findFirst().toString());
     }
     @Test
     public void polySerialization() throws Exception{

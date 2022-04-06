@@ -24,6 +24,21 @@ public class PilotService extends ExperimentService{
         super(questionService, scheduleService, testeeService, cacheService);
     }
 
+    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList){
+        if(session.isNew()){
+            String question_id = setUp(session, Schedule.ScheduleType.PILOT);
+            session.setAttribute("stop_count",0);
+            var selectedQuestion =  questionService.getById(question_id);
+            //Starts with a question that has infinite exposure time
+            ((CodeEvaluation)selectedQuestion).setExposureTime(-1);
+            return List.of(selectedQuestion);
+        }
+        else{
+            return this.continueAnswering(session,answerList);
+        }
+    }
+
+
     /**
      * Starts from 1 minutes and decrease, since in the continuing answering part, the question index
      *          * should be more than 0, so as the requirement stated, we should start from  infinite exposure time
@@ -42,97 +57,85 @@ public class PilotService extends ExperimentService{
         return selectedQuestion;
     }
 
-    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList){
-        if(session.isNew()){
-            String question_id = setUp(session, Schedule.ScheduleType.PILOT);
-            session.setAttribute("stop_count",0);
-            var selectedQuestion =  questionService.getById(question_id);
-            //Starts with a question that has infinite exposure time
-            ((CodeEvaluation)selectedQuestion).setExposureTime(-1);
-            return List.of(selectedQuestion);
+    public List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList){
+        //Continue the answering
+        AnswerStateCache answerStateCache = cacheService.getById(session.getId());
+        log.info("current cache info" + answerStateCache.toString());
+        Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
+        List<ScheduleModule> currentModuleList = schedule.getScheduleModuleList();
+        Testee testee = testeeService.getById(answerStateCache.getTesteeId());
+        int currentQuestionIndex = answerStateCache.getQuestionIndex();
+        int currentModuleIndex = answerStateCache.getModuleIndex();
+        ScheduleModule current_schedule_module = currentModuleList.get(currentModuleIndex);
+
+        //If the answer list is empty then the user is refreshing the page or comeback from closing a tab
+        if(answerList.size() == 0){
+            var selectedQuestion =getQuestionsByCacheInfo(answerStateCache,
+                    currentQuestionIndex,currentModuleIndex);
+            if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.CODE)
+                return List.of(setQuestionExposureTimeByQuestionIndex(selectedQuestion.get(0),currentQuestionIndex));
+            else if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO)
+                return selectedQuestion;
+        }
+
+        for(var answer : answerList){
+            testee.getAnswerMap().put(answer.getQuestionID(),answer);
+        }
+        testeeService.saveOne(testee);
+
+        //If the current answer is null(Cannot tell) then we start to count consecutive、
+        int stop_count = -1;
+        if(session.getAttribute("stop_count") != null){
+            stop_count = (int)session.getAttribute("stop_count");
+        }
+        //TODO make the stopping string as config
+        if(answerList.get(0).getAnswerText().equals("Cannot tell")){
+            stop_count ++;
+            session.setAttribute("stop_count",stop_count);
         }
         else{
+            session.setAttribute("stop_count",0);
+        }
+        if(stop_count >= ((EarlyStoppingSchedule)schedule).getStoppingCount()){
+            session.removeAttribute("stop_count");
+            return getQuestionsByCacheInfo(answerStateCache,0,currentModuleIndex + 1);
+        }
 
-            //Continue the answering
-            AnswerStateCache answerStateCache = cacheService.getById(session.getId());
-            log.info("current cache info" + answerStateCache.toString());
-            Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
-            List<ScheduleModule> currentModuleList = schedule.getScheduleModuleList();
-            Testee testee = testeeService.getById(answerStateCache.getTesteeId());
-            int currentQuestionIndex = answerStateCache.getQuestionIndex();
-            int currentModuleIndex = answerStateCache.getModuleIndex();
-            ScheduleModule current_schedule_module = currentModuleList.get(currentModuleIndex);
 
-            //If the answer list is empty then the user is refreshing the page or comeback from closing a tab
-            if(answerList.size() == 0){
-                var selectedQuestion =getQuestionsByCacheInfo(answerStateCache,
-                        currentQuestionIndex,currentModuleIndex);
-                if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.CODE)
-                    return List.of(setQuestionExposureTimeByQuestionIndex(selectedQuestion.get(0),currentQuestionIndex));
-                else if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO)
-                    return selectedQuestion;
+        // Return next question and next question index if the experiment is not completed
+
+        //Check if current module is demographic module if it is, then we need to move on to next module
+        if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO){
+            currentModuleIndex ++;
+            currentQuestionIndex = 0;
+        }
+
+        //If current module is not finished, continue on current module
+        if(currentQuestionIndex < current_schedule_module.getQuestionIdList().size() - 1 &&
+                currentModuleIndex < currentModuleList.size() - 1){
+            var selectedQuestion = getQuestionsByCacheInfo(answerStateCache,
+                    currentQuestionIndex + 1,currentModuleIndex);
+
+            //If we are in the Timed question module(which is the first module), we need to decrease the exposure time by 10 seconds till 1 second
+            // every time
+            if(currentModuleIndex == 0){
+                selectedQuestion = List.of(setQuestionExposureTimeByQuestionIndex(selectedQuestion.get(0),
+                        currentQuestionIndex + 1));
             }
-
-            for(var answer : answerList){
-                testee.getAnswerMap().put(answer.getQuestionID(),answer);
-            }
+            return selectedQuestion;
+        }
+        //If current module finished, continue on next module
+        else if(currentModuleIndex < currentModuleList.size() - 1){
+            return getQuestionsByCacheInfo(answerStateCache,0,currentModuleIndex + 1);
+        }
+        // Return null if the whole experiment is over and mark the testee as the completed one
+        else{
+            testee.setFinished(true);
             testeeService.saveOne(testee);
-
-            //If the current answer is null(Cannot tell) then we start to count consecutive、
-            int stop_count = -1;
-            if(session.getAttribute("stop_count") != null){
-                stop_count = (int)session.getAttribute("stop_count");
-            }
-            //TODO make the stopping string as config
-            if(answerList.get(0).getAnswerText().equals("Cannot tell")){
-                stop_count ++;
-                session.setAttribute("stop_count",stop_count);
-            }
-            else{
-                session.setAttribute("stop_count",0);
-            }
-            if(stop_count >= ((EarlyStoppingSchedule)schedule).getStoppingCount()){
-                session.removeAttribute("stop_count");
-                return getQuestionsByCacheInfo(answerStateCache,0,currentModuleIndex + 1);
-            }
-
-
-            // Return next question and next question index if the experiment is not completed
-
-            //Check if current module is demographic module if it is, then we need to move on to next module
-            if(current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO){
-                currentModuleIndex ++;
-                currentQuestionIndex = 0;
-            }
-
-            //If current module is not finished, continue on current module
-            if(currentQuestionIndex < current_schedule_module.getQuestionIdList().size() - 1 &&
-                    currentModuleIndex < currentModuleList.size() - 1){
-                var selectedQuestion = getQuestionsByCacheInfo(answerStateCache,
-                        currentQuestionIndex + 1,currentModuleIndex);
-
-                //If we are in the Timed question module(which is the first module), we need to decrease the exposure time by 10 seconds till 1 second
-                // every time
-                if(currentModuleIndex == 0){
-                    selectedQuestion = List.of(setQuestionExposureTimeByQuestionIndex(selectedQuestion.get(0),
-                            currentQuestionIndex + 1));
-                }
-                return selectedQuestion;
-            }
-            //If current module finished, continue on next module
-            else if(currentModuleIndex < currentModuleList.size() - 1){
-                return getQuestionsByCacheInfo(answerStateCache,0,currentModuleIndex + 1);
-            }
-            // Return null if the whole experiment is over and mark the testee as the completed one
-            else{
-                testee.setFinished(true);
-                testeeService.saveOne(testee);
-                cacheService.deleteById(session.getId());
-                session.invalidate();
-                return null;
-            }
+            cacheService.deleteById(session.getId());
+            session.invalidate();
+            return null;
         }
     }
-
 
 }
