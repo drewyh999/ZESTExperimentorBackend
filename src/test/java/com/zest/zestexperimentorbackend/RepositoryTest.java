@@ -16,6 +16,7 @@ import com.zest.zestexperimentorbackend.services.TesteeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -98,7 +99,7 @@ public class RepositoryTest {
     @Test
     public void polySerialization() throws Exception{
         var mapper = new ObjectMapper();
-        BaseQuestion q = questionRepository.findById("622bcd4c63bfe04aa02ff514").orElseThrow();
+        BaseQuestion q = questionRepository.findById("622bcd4c63bfe04aa02ff514").orElseThrow(()->new Exception());
         log.info(mapper.writeValueAsString(((CodeEvaluation)q)));
     }
     //More test on every entity
