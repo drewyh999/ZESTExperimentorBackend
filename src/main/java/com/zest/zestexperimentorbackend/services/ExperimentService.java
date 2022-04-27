@@ -6,6 +6,8 @@ import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModule;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -23,6 +25,8 @@ public class ExperimentService {
     final TesteeService testeeService;
 
     final CacheService cacheService;
+
+    static final Log log = LogFactory.getLog(PilotService.class);
 
     public ExperimentService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
         this.questionService = questionService;
@@ -112,9 +116,13 @@ public class ExperimentService {
         String ScheduleTypeString = type.toString().toLowerCase(Locale.ROOT);
         Testee testee = new Testee(ScheduleTypeString +"-"+ assigned_schedule.getTestGroup());
 
+
         //Initialize the answer map with null
         testee = setUpTestee(testee,assigned_schedule);
         Testee saved_testee = testeeService.saveOne(testee);
+
+        log.debug("incoming new participant: session ID" + session.getId() + "     Testee ID:" + saved_testee.getId());
+
 
         //Initialize the module and shuffle the question order so that random access could be achieved
         List<String> ModuleQuestionIDList = assigned_schedule.getScheduleModuleList().get(0).getQuestionIdList();
@@ -132,6 +140,7 @@ public class ExperimentService {
     List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList){
         //Continue the answering
         AnswerStateCache answerStateCache = cacheService.getById(session.getId());
+        log.debug(" continue incoming participants" + answerStateCache.toString());
         Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
         List<ScheduleModule> current_module_list = schedule.getScheduleModuleList();
         Testee testee = testeeService.getById(answerStateCache.getTesteeId());

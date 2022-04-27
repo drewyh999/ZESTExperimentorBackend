@@ -18,7 +18,6 @@ import java.util.List;
 @Service
 public class PilotService extends ExperimentService{
 
-    private static final Log log = LogFactory.getLog(PilotService.class);
 
     public PilotService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
         super(questionService, scheduleService, testeeService, cacheService);
@@ -60,7 +59,7 @@ public class PilotService extends ExperimentService{
     public List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList){
         //Continue the answering
         AnswerStateCache answerStateCache = cacheService.getById(session.getId());
-        log.info("current cache info" + answerStateCache.toString());
+        log.debug(" continue incoming participants" + answerStateCache.toString());
         Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
         List<ScheduleModule> currentModuleList = schedule.getScheduleModuleList();
         Testee testee = testeeService.getById(answerStateCache.getTesteeId());

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 public class ControllersLogger {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static long beforetime;
 
     @Pointcut("execution(* com.zest.zestexperimentorbackend.controllers.*(..))")

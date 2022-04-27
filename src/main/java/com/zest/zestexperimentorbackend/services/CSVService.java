@@ -38,7 +38,7 @@ public class CSVService {
         String localtimestring = dateTimeFormatter.format(dateTime);
 
         //Deal with file name and content type
-        servletResponse.addHeader("Content-Disposition","attachment; filename=" + "experiment-result-export"
+        servletResponse.addHeader("Content-Disposition","attachment; filename=" + mode + "-result-export"
                 +localtimestring + ".csv");
 
         //If nobody had taken the test yet. we return 404
