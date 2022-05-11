@@ -15,7 +15,6 @@ import java.util.List;
 }
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-//TODO Make schedule start and ending expandable(Maybe in the way of functional interface)
 public class Schedule {
     public enum ScheduleType{EXPERIMENT,PILOT}
     @Id

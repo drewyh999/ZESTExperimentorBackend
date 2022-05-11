@@ -1,5 +1,7 @@
 package com.zest.zestexperimentorbackend.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zest.zestexperimentorbackend.exceptions.BaseNotFoundExeption;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
@@ -57,7 +60,16 @@ public class CSVService {
         csvHeaderList.add("id");
         csvHeaderList.add("TestGroup");
         for(var question: questionList){
-            csvHeaderList.add(question.getAlias());
+
+            //For multiple choice questions, we should get all choices of the questions as the header
+            if(question.getQuestionType() == BaseQuestion.QuestionType.MULTI_CHOICE){
+                for(var choice :question.getQuestionChoices()){
+                    csvHeaderList.add(question.getAlias() +"_"+ choice);
+                }
+            }
+            else{
+                csvHeaderList.add(question.getAlias());
+            }
             csvHeaderList.add(question.getAlias() + "_time");
         }
 
@@ -72,12 +84,31 @@ public class CSVService {
                     List<String> record = new ArrayList<>();
                     record.add(testee.getId());
                     record.add(testee.getTestGroup());
-                    for (var entry : testee.getAnswerMap().entrySet()) {
-                        if(entry.getValue() != null) {
-                            record.add(entry.getValue().getAnswerText());
+                    var answerMap = testee.getAnswerMap();
+                    for (var question : questionList) {
+                        var answer = answerMap.get(question.getId());
+
+                        if(answer != null) {
+                            if(question.getQuestionType() != BaseQuestion.QuestionType.MULTI_CHOICE){
+                                record.add(answer.getAnswerText());
+                            }
+                            else{
+                                var mapper = new ObjectMapper();
+                                try {
+                                    Map<String, Boolean> choiceMap = mapper.readValue(answer.getAnswerText(),Map.class);
+                                    question.getQuestionChoices().forEach((choice) -> {
+                                        boolean b = (choiceMap.get(choice)) ? record.add("1") : record.add("0");
+                                    });
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                            var timeSpend = answerMap.get(question.getId()).getTimeSpent();
                             //Only print those question with time requirement
-                            if (entry.getValue().getTimeSpent() != null)
-                                record.add(entry.getValue().getTimeSpent().toString());
+                            if (timeSpend != null) {
+                                record.add(timeSpend.toString());
+                            }
                         }
                         else{
                             record.add("");

@@ -23,7 +23,8 @@ import java.util.List;
 * Make sure to add subtype info above if wish to extend more questions, and make sure to add @Data annotation to the
 * extended subclass so that jackson could serialize into subtypes properly*/
 public abstract class BaseQuestion {
-    public enum QuestionType{MULTI_CHOICE,SINGLE_CHOICE,TEXT}
+    //TODO add question type for scale
+    public enum QuestionType{MULTI_CHOICE,SINGLE_CHOICE,TEXT,SCALE_CHOICE}
     @Id
     protected String id;
 

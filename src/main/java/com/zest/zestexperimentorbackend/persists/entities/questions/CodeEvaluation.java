@@ -10,4 +10,6 @@ public class CodeEvaluation extends BaseQuestion{
     protected long exposureTime;
 
     protected String codeText;
+
+    protected String codeType;
 }

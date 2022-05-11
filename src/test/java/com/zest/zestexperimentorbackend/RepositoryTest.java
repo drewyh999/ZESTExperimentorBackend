@@ -50,19 +50,19 @@ public class RepositoryTest {
         schedule.setScheduleType(Schedule.ScheduleType.PILOT);
         schedule.setAlias("Test");
         schedule.setTestGroup("testgroup");
-        List<String> questionIdList = new ArrayList<>();
-        questionIdList.add("62263767c9feff2a21500b95");
-        questionIdList.add("622bcd4963bfe04aa02ff513");
-        questionIdList.add("622bcd4c63bfe04aa02ff514");
-        ScheduleModule module_1 = new ScheduleModule(questionIdList);
+        List<String> demographicQuestionIdList = new ArrayList<>();
+        demographicQuestionIdList.add("62263767c9feff2a21500b95");
+        demographicQuestionIdList.add("622bcd4963bfe04aa02ff513");
+        demographicQuestionIdList.add("622bcd4c63bfe04aa02ff514");
+        List<String> codeQuestionIdList = new ArrayList<>();
+        codeQuestionIdList.add("626715b106de306f38c727b0");
+        codeQuestionIdList.add("626715b106de306f38c727b1");
+        ScheduleModule module_1 = new ScheduleModule(codeQuestionIdList);
         module_1.setModuleType(ScheduleModule.ModuleType.CODE);
-        ScheduleModule module_2 = new ScheduleModule(questionIdList);
-        module_2.setModuleType(ScheduleModule.ModuleType.CODE);
-        ScheduleModule module_3 = new ScheduleModule(questionIdList);
+        ScheduleModule module_3 = new ScheduleModule(demographicQuestionIdList);
         module_3.setModuleType(ScheduleModule.ModuleType.DEMO);
         List<ScheduleModule> moduleList = new ArrayList<>();
         moduleList.add(module_1);
-        moduleList.add(module_2);
         moduleList.add(module_3);
         schedule.setScheduleModuleList(moduleList);
         scheduleRepository.save(schedule);
@@ -87,7 +87,7 @@ public class RepositoryTest {
     public void repoSearch() throws Exception{
         testeeRepository.deleteAll();
 //        questionRepository.deleteAll();
-//        scheduleRepository.deleteAll();
+       // scheduleRepository.deleteAll();
     }
 
     @Test
@@ -99,8 +99,16 @@ public class RepositoryTest {
     @Test
     public void polySerialization() throws Exception{
         var mapper = new ObjectMapper();
-        BaseQuestion q = questionRepository.findById("622bcd4c63bfe04aa02ff514").orElseThrow(()->new Exception());
-        log.info(mapper.writeValueAsString(((CodeEvaluation)q)));
+        String jsonString = "{\"Magnificent\":false,\"Significant\":false,\"Artificial\":true,\"Others\":true}";
+        Map<String,Boolean> map = mapper.readValue(jsonString,Map.class);
+
+        if(map.get("Significant")){
+            log.info("The conversion works!!");
+        }
+        else{
+            log.info("Indeed works");
+        }
+
     }
     //More test on every entity
 }
