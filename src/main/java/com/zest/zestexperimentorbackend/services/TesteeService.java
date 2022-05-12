@@ -20,11 +20,11 @@ public class TesteeService extends BaseCrudService<Testee>{
         return ((TesteeRepository)repository).findAllByTestGroupContains(testgroupString);
     }
 
-    public long getAmountByIsFinishing(Boolean finished){
+    public long getAmountByIsFinishingAndMode(Boolean finished, String mode){
         if(finished == null){
-            return ((TesteeRepository)repository).findAllBy().count();
+            return ((TesteeRepository)repository).findAllBy().filter(t -> t.getTestGroup().contains(mode)).count();
         }
-        return ((TesteeRepository)repository).findAllByFinishedIs(finished).count();
+        return ((TesteeRepository)repository).findAllByFinishedIs(finished).filter(t -> t.getTestGroup().contains(mode)).count();
     }
 
     public boolean ifAnyParticipants(String mode){

@@ -11,9 +11,10 @@ public interface TesteeRepository extends BaseRepository<Testee> {
 
     /**Use Stream in case we have millions of testee records in the database
      *
-     * @return the stream consisting of
+     * @return the stream consisting of required testees
      */
     Stream<Testee> findAllBy();
 
     Stream<Testee> findAllByFinishedIs(Boolean finished);
+
 }

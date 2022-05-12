@@ -92,9 +92,8 @@ public class RepositoryTest {
 
     @Test
     public void repoDelete() throws Exception{
-
-        Stream<Testee> testeeStream = testeeService.getByTestGroupContains("pilot");
-        log.info(testeeStream.findFirst().toString());
+        var amount = ((TesteeRepository)testeeRepository).findAllByFinishedIs(true).filter(t -> t.getTestGroup().contains("pilot")).count();
+        log.info("The amount of the pilot finished is " + amount);
     }
     @Test
     public void polySerialization() throws Exception{
