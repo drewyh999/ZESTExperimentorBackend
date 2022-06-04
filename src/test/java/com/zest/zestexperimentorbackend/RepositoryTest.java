@@ -86,7 +86,7 @@ public class RepositoryTest {
     @Test
     public void repoSearch() throws Exception{
         testeeRepository.deleteAll();
-//        questionRepository.deleteAll();
+        // questionRepository.deleteAll();
        // scheduleRepository.deleteAll();
     }
 

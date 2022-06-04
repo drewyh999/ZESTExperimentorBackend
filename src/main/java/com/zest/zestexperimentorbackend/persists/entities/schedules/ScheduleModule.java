@@ -1,5 +1,6 @@
 package com.zest.zestexperimentorbackend.persists.entities.schedules;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class ScheduleModule {
 
     private ModuleType moduleType;
 
+    @JsonCreator
     public ScheduleModule(List<String> questionIdList) {
         this.questionIdList = questionIdList;
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zest.zestexperimentorbackend.exceptions.BaseNotFoundExeption;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
+import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,9 @@ public class CSVService {
 
         //Create list of all questions which will be used as headers of the csv file
         List<String> questionIdList = new ArrayList<>();
-        scheduleService.getAll().get(0).getScheduleModuleList().forEach(scheduleModule -> questionIdList.addAll(scheduleModule.getQuestionIdList()));
+        //Find the  corresponding schedules that
+        scheduleService.getByType(Schedule.ScheduleType.valueOf(mode)).get(0).getScheduleModuleList()
+                .forEach(scheduleModule -> questionIdList.addAll(scheduleModule.getQuestionIdList()));
         List<BaseQuestion> questionList = questionService.getByIdList(questionIdList);
 
         //Get alias of the problem and use them as the csv file header
