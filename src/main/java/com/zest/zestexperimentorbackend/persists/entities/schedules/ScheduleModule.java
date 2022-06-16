@@ -7,6 +7,10 @@ import java.util.List;
 
 @Data
 public class ScheduleModule {
+    /**
+     In a code module, each question will be displayed in a single page. While in a demographic module, all the questions
+     will be displayed in a single page
+     */
     public enum ModuleType{CODE,DEMO}
 
     private List<String> questionIdList;

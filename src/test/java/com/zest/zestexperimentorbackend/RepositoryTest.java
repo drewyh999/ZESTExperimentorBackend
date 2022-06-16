@@ -51,12 +51,12 @@ public class RepositoryTest {
         schedule.setAlias("Test");
         schedule.setTestGroup("testgroup");
         List<String> demographicQuestionIdList = new ArrayList<>();
-        demographicQuestionIdList.add("62263767c9feff2a21500b95");
-        demographicQuestionIdList.add("622bcd4963bfe04aa02ff513");
-        demographicQuestionIdList.add("622bcd4c63bfe04aa02ff514");
+        demographicQuestionIdList.add("62aae9eb70482e25f22bde8b");
+        demographicQuestionIdList.add("62aae9eb70482e25f22bde8c");
+        demographicQuestionIdList.add("62aae9eb70482e25f22bde8f");
         List<String> codeQuestionIdList = new ArrayList<>();
-        codeQuestionIdList.add("626715b106de306f38c727b0");
-        codeQuestionIdList.add("626715b106de306f38c727b1");
+        codeQuestionIdList.add("62aae9eb70482e25f22bde8d");
+        codeQuestionIdList.add("62aae9eb70482e25f22bde8e");
         ScheduleModule module_1 = new ScheduleModule(codeQuestionIdList);
         module_1.setModuleType(ScheduleModule.ModuleType.CODE);
         ScheduleModule module_3 = new ScheduleModule(demographicQuestionIdList);
@@ -85,9 +85,9 @@ public class RepositoryTest {
 
     @Test
     public void repoSearch() throws Exception{
-        testeeRepository.deleteAll();
-        // questionRepository.deleteAll();
-       // scheduleRepository.deleteAll();
+       // testeeRepository.deleteAll();
+       // questionRepository.deleteAll();
+        scheduleRepository.deleteAll();
     }
 
     @Test

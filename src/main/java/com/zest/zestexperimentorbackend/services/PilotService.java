@@ -18,6 +18,7 @@ import java.util.List;
 @Service
 public class PilotService extends ExperimentService{
 
+    private static final Log log = LogFactory.getLog(PilotService.class);
 
     public PilotService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
         super(questionService, scheduleService, testeeService, cacheService);
@@ -27,6 +28,7 @@ public class PilotService extends ExperimentService{
         if(session.isNew()){
             String question_id = setUp(session, Schedule.ScheduleType.PILOT);
             session.setAttribute("stop_count",0);
+            log.info("Fetching new question with id" + question_id);
             var selectedQuestion =  questionService.getById(question_id);
             //Starts with a question that has infinite exposure time
             ((CodeEvaluation)selectedQuestion).setExposureTime(-1);

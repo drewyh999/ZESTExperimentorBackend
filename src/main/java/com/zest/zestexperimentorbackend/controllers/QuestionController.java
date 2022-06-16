@@ -23,8 +23,8 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/questions",params = "questiontype")
-    List<BaseQuestion> getQuestionByQuestionType(BaseQuestion.QuestionType type){
-        return questionService.getQuestionByType(type);
+    List<BaseQuestion> getQuestionByQuestionType(BaseQuestion.QuestionChoiceType type){
+        return questionService.getQuestionByChoiceType(type);
     }
 
     @GetMapping("/questions")

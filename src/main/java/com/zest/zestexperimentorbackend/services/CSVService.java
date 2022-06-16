@@ -65,7 +65,7 @@ public class CSVService {
         for(var question: questionList){
 
             //For multiple choice questions, we should get all choices of the questions as the header
-            if(question.getQuestionType() == BaseQuestion.QuestionType.MULTI_CHOICE){
+            if(question.getQuestionChoiceType() == BaseQuestion.QuestionChoiceType.MULTI_CHOICE){
                 for(var choice :question.getQuestionChoices()){
                     csvHeaderList.add(question.getAlias() +"_"+ choice);
                 }
@@ -92,7 +92,7 @@ public class CSVService {
                         var answer = answerMap.get(question.getId());
 
                         if(answer != null) {
-                            if(question.getQuestionType() != BaseQuestion.QuestionType.MULTI_CHOICE){
+                            if(question.getQuestionChoiceType() != BaseQuestion.QuestionChoiceType.MULTI_CHOICE){
                                 record.add(answer.getAnswerText());
                             }
                             else{

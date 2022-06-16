@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+// TODO implement stategy pattern to adapt different approach used by pilot and experiment
+
 @Service
 public class ExperimentService {
     final QuestionService questionService;
@@ -121,7 +123,7 @@ public class ExperimentService {
         testee = setUpTestee(testee,assigned_schedule);
         Testee saved_testee = testeeService.saveOne(testee);
 
-        log.debug("incoming new participant: session ID" + session.getId() + "     Testee ID:" + saved_testee.getId());
+        log.info("incoming new participant: session ID" + session.getId() + "     Testee ID:" + saved_testee.getId());
 
 
         //Initialize the module and shuffle the question order so that random access could be achieved
