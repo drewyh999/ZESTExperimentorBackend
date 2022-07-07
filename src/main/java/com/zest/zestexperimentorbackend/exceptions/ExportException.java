@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public class ExportException extends IOException {
     public ExportException(Testee testee){
-        super("Exception happen while exporting" + testee.toString());
+        super("Exception happen while exporting CSV" + testee.toString());
     }
 }

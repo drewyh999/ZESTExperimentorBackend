@@ -1,5 +1,6 @@
 package com.zest.zestexperimentorbackend.services;
 
+import com.zest.zestexperimentorbackend.exceptions.ServiceException;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
 import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
@@ -24,12 +25,18 @@ public class PilotService extends ExperimentService{
         super(questionService, scheduleService, testeeService, cacheService);
     }
 
-    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList){
+    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList) throws ServiceException {
         if(session.isNew()){
             String question_id = setUp(session, Schedule.ScheduleType.PILOT);
             session.setAttribute("stop_count",0);
             log.info("Fetching new question with id" + question_id);
             var selectedQuestion =  questionService.getById(question_id);
+
+            if (! (selectedQuestion instanceof CodeEvaluation) ){
+                throw new ServiceException("First module of the pilot schedule must " +
+                        "be a code evaluation module and they must contains code evaluation questions");
+            }
+
             //Starts with a question that has infinite exposure time
             ((CodeEvaluation)selectedQuestion).setExposureTime(-1);
             return List.of(selectedQuestion);
