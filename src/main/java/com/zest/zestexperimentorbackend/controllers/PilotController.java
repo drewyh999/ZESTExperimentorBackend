@@ -23,8 +23,11 @@ public class PilotController {
     }
 
     @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
-    @PostMapping("/pilot")
-    public List<BaseQuestion> runPilot(HttpSession session, @RequestBody ArrayList<Answer> answerList) throws ServiceException {
-        return pilotService.runPilot(session, answerList);
+    @PostMapping("/pilot/{invitation_id}")
+    public List<BaseQuestion> runPilot(HttpSession session,
+                                       @RequestBody ArrayList<Answer> answerList,
+                                       @PathVariable String invitation_id
+    ) throws ServiceException {
+        return pilotService.runPilot(session, answerList, invitation_id);
     }
 }

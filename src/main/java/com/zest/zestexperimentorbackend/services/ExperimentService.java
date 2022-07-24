@@ -1,7 +1,8 @@
 package com.zest.zestexperimentorbackend.services;
 
+import com.zest.zestexperimentorbackend.persists.entities.Invitation;
 import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
-import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
+import com.zest.zestexperimentorbackend.cache.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-// TODO implement stategy pattern to adapt different approach used by pilot and experiment
+// TODO implement strategy pattern to adapt different approach used by pilot and experiment
 
 @Service
 public class ExperimentService {
@@ -28,19 +29,22 @@ public class ExperimentService {
 
     final CacheService cacheService;
 
+    final InvitationService invitationService;
+
     static final Log log = LogFactory.getLog(PilotService.class);
 
-    public ExperimentService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
+    public ExperimentService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService, InvitationService invitationService) {
         this.questionService = questionService;
         this.scheduleService = scheduleService;
         this.testeeService = testeeService;
         this.cacheService = cacheService;
+        this.invitationService = invitationService;
     }
 
-    public List<BaseQuestion> runExperiment(HttpSession session, List<Answer> answerList){
+    public List<BaseQuestion> runExperiment(HttpSession session, List<Answer> answerList, String invitation_id){
         // Schedule -> List of Modules in the schedule -> List of question id in the module
         if(session.isNew()){
-            String question_id = setUp(session, Schedule.ScheduleType.EXPERIMENT);
+            String question_id = setUp(session, Schedule.ScheduleType.EXPERIMENT, invitation_id);
             return List.of(questionService.getById(question_id));
         }
         else{
@@ -83,7 +87,8 @@ public class ExperimentService {
         if(moduleIndex != currentModuleIndex){
             List<String> newModuleQuestionIdList = schedule.getScheduleModuleList().get(moduleIndex).getQuestionIdList();
             Collections.shuffle(newModuleQuestionIdList,new Random(System.currentTimeMillis()));
-            answerStateCache.setCurrentModuleQuestionIDList(newModuleQuestionIdList);
+            var newModuleQuestionList = questionService.getByIdList(newModuleQuestionIdList);
+            answerStateCache.setCurrentModuleQuestionList(newModuleQuestionList);
         }
 
         //Update current question index and the module index
@@ -95,16 +100,16 @@ public class ExperimentService {
 
         //We should return all the question if the current module is a demographic question module
         if(schedule.getScheduleModuleList().get(answerStateCache.getModuleIndex()).getModuleType() == ScheduleModule.ModuleType.DEMO){
-            return questionService.getByIdList(answerStateCache.getCurrentModuleQuestionIDList());
+            return answerStateCache.getCurrentModuleQuestionList();
         }
         //Or return single item when dealing with other type of module
         else{
-            return List.of(questionService.getById(answerStateCache.getCurrentModuleQuestionIDList().get(questionIndex)));
+            return List.of(answerStateCache.getCurrentModuleQuestionList().get(questionIndex));
         }
     }
 
     //Set up the first session and return ID of the first question
-    String setUp(HttpSession session, Schedule.ScheduleType type){
+    String setUp(HttpSession session, Schedule.ScheduleType type, String invitation_id){
         //Assign the new testee to a random test group(each schedule could represent a test group)
         List<Schedule> schedule_list = scheduleService.getByType(type);
         Random random = new Random(session.getCreationTime());
@@ -116,23 +121,26 @@ public class ExperimentService {
 
         //create a new testee
         String ScheduleTypeString = type.toString().toLowerCase(Locale.ROOT);
-        Testee testee = new Testee(ScheduleTypeString +"-"+ assigned_schedule.getTestGroup());
+        // Get the invitation source of this testee
+        var invitation = invitationService.getById(invitation_id);
+        Testee testee = new Testee(ScheduleTypeString +"-"+ assigned_schedule.getTestGroup(),invitation.getSource());
 
 
         //Initialize the answer map with null
         testee = setUpTestee(testee,assigned_schedule);
         Testee saved_testee = testeeService.saveOne(testee);
 
-        log.info("incoming new participant: session ID" + session.getId() + "     Testee ID:" + saved_testee.getId());
+        log.info("incoming new participant: session ID " + session.getId() + "     Testee ID: " + saved_testee.getId());
 
 
         //Initialize the module and shuffle the question order so that random access could be achieved
         List<String> ModuleQuestionIDList = assigned_schedule.getScheduleModuleList().get(0).getQuestionIdList();
         Collections.shuffle(ModuleQuestionIDList,random);
+        var moduleQuestionList = questionService.getByIdList(ModuleQuestionIDList);
 
         //Create new cache object to store in redis
         AnswerStateCache answerStateCache = new AnswerStateCache(session.getId(),0,0
-                ,saved_testee.getId(), assigned_schedule.getId(), ModuleQuestionIDList);
+                ,saved_testee.getId(), assigned_schedule.getId(), moduleQuestionList);
 
         cacheService.saveOne(answerStateCache);
 

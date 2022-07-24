@@ -1,7 +1,7 @@
 package com.zest.zestexperimentorbackend.services;
 
 import com.zest.zestexperimentorbackend.exceptions.BaseNotFoundExeption;
-import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
+import com.zest.zestexperimentorbackend.cache.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.repositories.CacheRepository;
 import org.springframework.stereotype.Service;
 

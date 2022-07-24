@@ -21,10 +21,13 @@ public class Testee {
 
     private boolean finished;
 
-    public Testee(String testGroup) {
+    private String invitationSource;
+
+    public Testee(String testGroup, String invitationSource) {
         this.testGroup = testGroup;
         this.answerMap = new HashMap<>();
         this.finished = false;
+        this.invitationSource = invitationSource;
     }
 
 }

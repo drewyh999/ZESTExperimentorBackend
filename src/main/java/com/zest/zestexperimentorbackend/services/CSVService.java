@@ -35,6 +35,7 @@ public class CSVService {
     }
 
     //Returns the path to the csv file on the server for download
+    //TODO Add the source of the participant to the output fields
     public void exportCSV(HttpServletResponse servletResponse, String mode) throws IOException, BaseNotFoundExeption {
         servletResponse.setContentType("text/csv");
         LocalDateTime dateTime = LocalDateTime.now();
@@ -62,6 +63,7 @@ public class CSVService {
         List<String> csvHeaderList = new ArrayList<>();
         csvHeaderList.add("id");
         csvHeaderList.add("TestGroup");
+        csvHeaderList.add("InvitationSource");
         for(var question: questionList){
 
             //For multiple choice questions, we should get all choices of the questions as the header
@@ -87,6 +89,7 @@ public class CSVService {
                     List<String> record = new ArrayList<>();
                     record.add(testee.getId());
                     record.add(testee.getTestGroup());
+                    record.add(testee.getInvitationSource());
                     var answerMap = testee.getAnswerMap();
                     for (var question : questionList) {
                         var answer = answerMap.get(question.getId());

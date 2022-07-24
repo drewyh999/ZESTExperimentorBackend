@@ -1,6 +1,6 @@
 package com.zest.zestexperimentorbackend.persists.repositories;
 
-import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
+import com.zest.zestexperimentorbackend.cache.AnswerStateCache;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

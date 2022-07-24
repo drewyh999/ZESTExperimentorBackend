@@ -3,7 +3,7 @@ package com.zest.zestexperimentorbackend.services;
 import com.zest.zestexperimentorbackend.exceptions.ServiceException;
 import com.zest.zestexperimentorbackend.persists.entities.Testee;
 import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
-import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
+import com.zest.zestexperimentorbackend.cache.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.persists.entities.questions.CodeEvaluation;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.EarlyStoppingSchedule;
@@ -21,15 +21,15 @@ public class PilotService extends ExperimentService{
 
     private static final Log log = LogFactory.getLog(PilotService.class);
 
-    public PilotService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService) {
-        super(questionService, scheduleService, testeeService, cacheService);
+    public PilotService(QuestionService questionService, ScheduleService scheduleService, TesteeService testeeService, CacheService cacheService, InvitationService invitationService) {
+        super(questionService, scheduleService, testeeService, cacheService, invitationService);
     }
 
-    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList) throws ServiceException {
+    public List<BaseQuestion> runPilot(HttpSession session, List<Answer> answerList, String invitation_id) throws ServiceException {
         if(session.isNew()){
-            String question_id = setUp(session, Schedule.ScheduleType.PILOT);
+            String question_id = setUp(session, Schedule.ScheduleType.PILOT, invitation_id);
             session.setAttribute("stop_count",0);
-            log.info("Fetching new question with id" + question_id);
+            log.info("Fetching new question with id " + question_id);
             var selectedQuestion =  questionService.getById(question_id);
 
             if (! (selectedQuestion instanceof CodeEvaluation) ){
@@ -68,7 +68,7 @@ public class PilotService extends ExperimentService{
     public List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList){
         //Continue the answering
         AnswerStateCache answerStateCache = cacheService.getById(session.getId());
-        log.debug(" continue incoming participants" + answerStateCache.toString());
+        log.info(" continue incoming participants " + answerStateCache.toString());
         Schedule schedule = scheduleService.getById(answerStateCache.getScheduleId());
         List<ScheduleModule> currentModuleList = schedule.getScheduleModuleList();
         Testee testee = testeeService.getById(answerStateCache.getTesteeId());

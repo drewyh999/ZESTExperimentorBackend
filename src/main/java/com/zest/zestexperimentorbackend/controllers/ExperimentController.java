@@ -3,9 +3,7 @@ package com.zest.zestexperimentorbackend.controllers;
 import com.zest.zestexperimentorbackend.persists.entities.answers.Answer;
 import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.services.ExperimentService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -19,8 +17,9 @@ public class ExperimentController {
         this.experimentService = experimentService;
     }
 
-    @GetMapping("/experiment")
-    List<BaseQuestion> runExperiment(HttpSession session, @RequestBody List<Answer> answerList){
-        return experimentService.runExperiment(session, answerList);
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+    @GetMapping("/experiment/{invitation_id}")
+    List<BaseQuestion> runExperiment(HttpSession session, @RequestBody List<Answer> answerList, @PathVariable String invitation_id){
+        return experimentService.runExperiment(session, answerList, invitation_id);
     }
 }

@@ -1,28 +1,22 @@
 package com.zest.zestexperimentorbackend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zest.zestexperimentorbackend.persists.entities.Testee;
-import com.zest.zestexperimentorbackend.persists.entities.cacheobjects.AnswerStateCache;
-import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
-import com.zest.zestexperimentorbackend.persists.entities.questions.DemographicQuestion;
-import com.zest.zestexperimentorbackend.persists.entities.questions.CodeEvaluation;
+import com.zest.zestexperimentorbackend.persists.entities.Invitation;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.EarlyStoppingSchedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import com.zest.zestexperimentorbackend.persists.entities.schedules.ScheduleModule;
 import com.zest.zestexperimentorbackend.persists.repositories.QuestionRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.ScheduleRepository;
 import com.zest.zestexperimentorbackend.persists.repositories.TesteeRepository;
+import com.zest.zestexperimentorbackend.services.InvitationService;
 import com.zest.zestexperimentorbackend.services.TesteeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
@@ -40,6 +34,9 @@ public class RepositoryTest {
 
     @Autowired
     TesteeService testeeService;
+
+    @Autowired
+    InvitationService invitationService;
 
     private static final Log log = LogFactory.getLog(RepositoryTest.class);
 
@@ -68,26 +65,17 @@ public class RepositoryTest {
         scheduleRepository.save(schedule);
     }
     @Test
-    public void shuffleList() throws Exception{
-        List<String> questionIdList = new ArrayList<>();
-        questionIdList.add("62263767c9feff2a21500b95");
-        questionIdList.add("622bcd4963bfe04aa02ff513");
-        questionIdList.add("622bcd4c63bfe04aa02ff514");
-        log.info(questionIdList);
-        AnswerStateCache answerStateCache = new AnswerStateCache();
-        Collections.shuffle(questionIdList, new Random(System.currentTimeMillis()));
-        log.info(questionIdList);
-
-        answerStateCache.setCurrentModuleQuestionIDList(questionIdList);
-        log.info(answerStateCache.getCurrentModuleQuestionIDList());
-
+    public void invitationTest() throws Exception{
+        var invitation = new Invitation("Twitter");
+        var savedInvitation = invitationService.saveOne(invitation);
+        log.info(savedInvitation.getId());
     }
 
     @Test
     public void repoSearch() throws Exception{
-       // testeeRepository.deleteAll();
+        testeeRepository.deleteAll();
        // questionRepository.deleteAll();
-        scheduleRepository.deleteAll();
+//        scheduleRepository.deleteAll();
     }
 
     @Test
