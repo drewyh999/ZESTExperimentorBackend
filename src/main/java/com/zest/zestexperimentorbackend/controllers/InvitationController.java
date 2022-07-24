@@ -23,8 +23,9 @@ public class InvitationController {
 
     @PostMapping("/invitations")
     @ResponseStatus(HttpStatus.OK)
-    void addInvitation(@RequestBody List<Invitation> invitationList){
-        invitationService.save(invitationList);
+    String addInvitation(@RequestBody Invitation invitation){
+        var saved_invitation = invitationService.saveOne(invitation);
+        return saved_invitation.getId();
     }
 
 
