@@ -13,6 +13,7 @@ public class Invitation {
 
     private String source;
 
+    @JsonCreator
     public Invitation(String source) {
         this.source = source;
     }
