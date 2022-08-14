@@ -8,6 +8,8 @@ import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion
 import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ public class CSVService {
 
     ScheduleService scheduleService;
 
+    private static final Log log = LogFactory.getLog(PilotService.class);
 
     public CSVService(QuestionService questionService, TesteeService testeeService, ScheduleService scheduleService) {
         this.questionService = questionService;
@@ -35,7 +38,6 @@ public class CSVService {
     }
 
     //Returns the path to the csv file on the server for download
-    //TODO Add the source of the participant to the output fields
     public void exportCSV(HttpServletResponse servletResponse, String mode) throws IOException, BaseNotFoundExeption {
         servletResponse.setContentType("text/csv");
         LocalDateTime dateTime = LocalDateTime.now();
@@ -48,6 +50,7 @@ public class CSVService {
 
         //If nobody had taken the test yet. we return 404
         if(!testeeService.ifAnyParticipants(mode)){
+            log.info("No testees available for exporting");
             servletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -55,7 +58,7 @@ public class CSVService {
         //Create list of all questions which will be used as headers of the csv file
         List<String> questionIdList = new ArrayList<>();
         //Find the  corresponding schedules that
-        scheduleService.getByType(Schedule.ScheduleType.valueOf(mode)).get(0).getScheduleModuleList()
+        scheduleService.getByType(Schedule.ScheduleType.valueOf(mode.toUpperCase())).get(0).getScheduleModuleList()
                 .forEach(scheduleModule -> questionIdList.addAll(scheduleModule.getQuestionIdList()));
         List<BaseQuestion> questionList = questionService.getByIdList(questionIdList);
 

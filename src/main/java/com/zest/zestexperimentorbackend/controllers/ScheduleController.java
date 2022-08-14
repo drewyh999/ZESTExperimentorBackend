@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 public class ScheduleController {
 
@@ -18,15 +19,18 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
+
     @GetMapping(value = "/schedules",params = "alias")
     List<Schedule> getSchedulesByAlias(String alias){
         return scheduleService.getByAlias(alias);
     }
 
+
     @GetMapping("/schedules")
     List<Schedule> allSchedules(){
         return scheduleService.getAll();
     }
+
 
     @PostMapping("/schedules")
     @ResponseStatus(HttpStatus.OK)
@@ -34,15 +38,22 @@ public class ScheduleController {
         scheduleService.save(scheduleList);
     }
 
+
     @GetMapping("/schedules/{id}")
     Schedule getSchedule(@PathVariable String id){
         return scheduleService.getById(id);
     }
 
+
     @DeleteMapping("/schedule/{id}")
     @ResponseStatus(HttpStatus.OK)
     void deletedSchedule(@PathVariable String id){
         scheduleService.deleteById(id);
+    }
+
+    @GetMapping("/schedule/question/{questionId}")
+    List<String> getScheduleIdsByQuestion(@PathVariable String questionId){
+        return scheduleService.getScheduleIdsByQuestionId(questionId);
     }
 
 }

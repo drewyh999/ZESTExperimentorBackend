@@ -13,7 +13,7 @@ import javax.sql.rowset.serial.SerialException;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+
 @RestController
 public class PilotController {
     private final PilotService pilotService;
