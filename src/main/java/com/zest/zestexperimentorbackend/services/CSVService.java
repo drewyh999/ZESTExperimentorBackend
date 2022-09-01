@@ -95,6 +95,10 @@ public class CSVService {
                     record.add(testee.getInvitationSource());
                     var answerMap = testee.getAnswerMap();
                     for (var question : questionList) {
+                        // If the answered question is deleted, we simply ignore it
+                        if (!answerMap.containsKey(question.getId())){
+                            continue;
+                        }
                         var answer = answerMap.get(question.getId());
 
                         if(answer != null) {

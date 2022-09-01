@@ -5,6 +5,9 @@ import com.zest.zestexperimentorbackend.cache.AnswerStateCache;
 import com.zest.zestexperimentorbackend.persists.repositories.CacheRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CacheService {
     public final CacheRepository repository;
@@ -13,8 +16,8 @@ public class CacheService {
         this.repository = cacheRepository;
     }
 
-    public AnswerStateCache saveOne(AnswerStateCache item){
-        return repository.save(item);
+    public void saveOne(AnswerStateCache item){
+        repository.save(item);
     }
 
     public AnswerStateCache getById(String id){
@@ -23,5 +26,10 @@ public class CacheService {
 
     public void deleteById(String id){
         repository.deleteById(id);
+    }
+
+    public List<String> getTesteeIdsInCacheByScheduleId(String scheduleId){
+        var caches =  repository.findAllByScheduleIdIs(scheduleId);
+        return caches.stream().map(AnswerStateCache::getTesteeId).collect(Collectors.toList());
     }
 }
