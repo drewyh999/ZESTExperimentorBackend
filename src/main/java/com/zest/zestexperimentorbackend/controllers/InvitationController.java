@@ -1,13 +1,14 @@
 package com.zest.zestexperimentorbackend.controllers;
 
+import com.zest.zestexperimentorbackend.persists.dto.InvitationDTO;
 import com.zest.zestexperimentorbackend.persists.entities.Invitation;
-import com.zest.zestexperimentorbackend.persists.entities.questions.BaseQuestion;
 import com.zest.zestexperimentorbackend.services.InvitationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+
+@CrossOrigin(origins = "${server.allowedorigin}", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 public class InvitationController {
     private final InvitationService invitationService;
@@ -17,21 +18,22 @@ public class InvitationController {
     }
 
     @GetMapping("/invitations")
-    List<Invitation> allInvitations(){
+    List<Invitation> allInvitations() {
         return invitationService.getAll();
     }
 
     @PostMapping("/invitations")
     @ResponseStatus(HttpStatus.OK)
-    String addInvitation(@RequestBody Invitation invitation){
-        var saved_invitation = invitationService.saveOne(invitation);
-        return saved_invitation.getId();
+    String addInvitation(@RequestBody InvitationDTO invitation) {
+        Invitation dbRecord = new Invitation(invitation.getSource(), invitation.getType());
+        var savedInvitation = invitationService.saveOne(dbRecord);
+        return savedInvitation.getId();
     }
 
 
     @DeleteMapping("/invitations/{id}")
     @ResponseStatus(HttpStatus.OK)
-    void deleteInvitation(@PathVariable String id){
+    void deleteInvitation(@PathVariable String id) {
         invitationService.deleteById(id);
     }
 }

@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:3000")
+
+@CrossOrigin(origins = "${server.allowedorigin}")
 @RestController
 public class QuestionController {
 
@@ -17,35 +18,35 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    @GetMapping(value = "/questions",params = "alias")
-    List<BaseQuestion> getQuestionByAlias(String alias){
+    @GetMapping(value = "/questions", params = "alias")
+    List<BaseQuestion> getQuestionByAlias(String alias) {
         return questionService.getByAlias(alias);
     }
 
-    @GetMapping(value = "/questions",params = "questiontype")
-    List<BaseQuestion> getQuestionByQuestionType(BaseQuestion.QuestionChoiceType type){
+    @GetMapping(value = "/questions", params = "questiontype")
+    List<BaseQuestion> getQuestionByQuestionType(BaseQuestion.QuestionChoiceType type) {
         return questionService.getQuestionByChoiceType(type);
     }
 
     @GetMapping("/questions")
-    List<BaseQuestion> allQuestions(){
+    List<BaseQuestion> allQuestions() {
         return questionService.getAll();
     }
 
     @PostMapping("/questions")
     @ResponseStatus(HttpStatus.OK)
-    void addQuestion(@RequestBody List<BaseQuestion> questionList){
+    void addQuestion(@RequestBody List<BaseQuestion> questionList) {
         questionService.save(questionList);
     }
 
     @GetMapping("/questions/{id}")
-    BaseQuestion getQuestion(@PathVariable String id){
+    BaseQuestion getQuestion(@PathVariable String id) {
         return questionService.getById(id);
     }
 
     @DeleteMapping("/questions/{id}")
     @ResponseStatus(HttpStatus.OK)
-    void deleteQuestion(@PathVariable String id){
+    void deleteQuestion(@PathVariable String id) {
         questionService.deleteById(id);
     }
 }

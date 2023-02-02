@@ -1,6 +1,7 @@
 package com.zest.zestexperimentorbackend.persists.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.zest.zestexperimentorbackend.persists.entities.schedules.Schedule;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,8 +14,11 @@ public class Invitation {
 
     private String source;
 
+    private Schedule.ScheduleType type;
+
     @JsonCreator
-    public Invitation(String source) {
+    public Invitation(String source, Schedule.ScheduleType type) {
         this.source = source;
+        this.type = type;
     }
 }
