@@ -22,7 +22,7 @@ public class ExperimentController {
     @GetMapping("/experiment/{invitation_id}")
     List<BaseQuestion> runExperiment(HttpSession session,
                                      @RequestBody List<Answer> answerList,
-                                     @PathVariable String invitationId) {
-        return experimentService.runExperiment(session, answerList, invitationId);
+                                     @PathVariable String invitation_id) {
+        return experimentService.runExperiment(session, answerList, invitation_id);
     }
 }
