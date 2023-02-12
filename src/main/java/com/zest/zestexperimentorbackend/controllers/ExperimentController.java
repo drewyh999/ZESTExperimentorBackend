@@ -19,7 +19,7 @@ public class ExperimentController {
     }
 
     @CrossOrigin(origins = "${server.allowedorigin}", allowedHeaders = "*", allowCredentials = "true")
-    @GetMapping("/experiment/{invitation_id}")
+    @PostMapping("/experiment/{invitation_id}")
     List<BaseQuestion> runExperiment(HttpSession session,
                                      @RequestBody List<Answer> answerList,
                                      @PathVariable String invitation_id) {
