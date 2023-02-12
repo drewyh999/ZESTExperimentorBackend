@@ -21,6 +21,7 @@ public class PilotService extends ExperimentService {
 
     private static final Log log = LogFactory.getLog(PilotService.class);
 
+
     public PilotService(QuestionService questionService,
                         ScheduleService scheduleService,
                         TesteeService testeeService,
@@ -31,20 +32,21 @@ public class PilotService extends ExperimentService {
 
     public List<BaseQuestion> runPilot(HttpSession session,
                                        List<Answer> answerList,
-                                       String invitation_id) throws ServiceException {
+                                       String invitationId) throws ServiceException {
         if (session.isNew()) {
-            String question_id = setUp(session, Schedule.ScheduleType.PILOT, invitation_id);
+            var questionIdList = setUp(session, Schedule.ScheduleType.PILOT, invitationId);
+            //TODO Maybe should use a different answer cache object to store it?
             session.setAttribute("stop_count", 0);
-            var selectedQuestion = questionService.getById(question_id);
+            var selectedQuestions = questionService.getByIdList(questionIdList);
 
-            if (!(selectedQuestion instanceof CodeEvaluation)) {
+            if (!(selectedQuestions.get(0) instanceof CodeEvaluation)) {
                 throw new ServiceException("First module of the pilot schedule must " +
                         "be a code evaluation module and they must contains code evaluation questions");
             }
 
             //Starts with a question that has infinite exposure time
-            ((CodeEvaluation) selectedQuestion).setExposureTime(-1);
-            return List.of(selectedQuestion);
+            ((CodeEvaluation) selectedQuestions).setExposureTime(-1);
+            return selectedQuestions;
         } else {
             return this.continueAnswering(session, answerList);
         }
@@ -70,6 +72,7 @@ public class PilotService extends ExperimentService {
         return selectedQuestion;
     }
 
+    @Override
     public List<BaseQuestion> continueAnswering(HttpSession session, List<Answer> answerList) {
         //Continue the answering
         AnswerStateCache answerStateCache = cacheService.getById(session.getId());
@@ -79,15 +82,15 @@ public class PilotService extends ExperimentService {
         Testee testee = testeeService.getById(answerStateCache.getTesteeId());
         int currentQuestionIndex = answerStateCache.getQuestionIndex();
         int currentModuleIndex = answerStateCache.getModuleIndex();
-        ScheduleModule current_schedule_module = currentModuleList.get(currentModuleIndex);
+        ScheduleModule currentScheduleModule = currentModuleList.get(currentModuleIndex);
 
         //If the answer list is empty then the user is refreshing the page or comeback from closing a tab
-        if (answerList.size() == 0) {
+        if (answerList.isEmpty()) {
             var selectedQuestion = getQuestionsByCacheInfo(answerStateCache,
                     currentQuestionIndex, currentModuleIndex);
-            if (current_schedule_module.getModuleType() == ScheduleModule.ModuleType.CODE)
+            if (currentScheduleModule.getModuleType() == ScheduleModule.ModuleType.CODE)
                 return List.of(setQuestionExposureTimeByQuestionIndex(selectedQuestion.get(0), currentQuestionIndex));
-            else if (current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO)
+            else if (currentScheduleModule.getModuleType() == ScheduleModule.ModuleType.DEMO)
                 return selectedQuestion;
         }
 
@@ -97,18 +100,18 @@ public class PilotService extends ExperimentService {
         testeeService.saveOne(testee);
 
         //If the current answer is null(Cannot tell) then we start to count consecutive、
-        int stop_count = -1;
+        int stopCount = -1;
         if (session.getAttribute("stop_count") != null) {
-            stop_count = (int) session.getAttribute("stop_count");
+            stopCount = (int) session.getAttribute("stop_count");
         }
         //TODO make the stopping string as config
         if (answerList.get(0).getAnswerText().equals("Cannot tell")) {
-            stop_count++;
-            session.setAttribute("stop_count", stop_count);
+            stopCount++;
+            session.setAttribute("stop_count", stopCount);
         } else {
             session.setAttribute("stop_count", 0);
         }
-        if (stop_count >= ((EarlyStoppingSchedule) schedule).getStoppingCount()) {
+        if (stopCount >= ((EarlyStoppingSchedule) schedule).getStoppingCount()) {
             session.removeAttribute("stop_count");
             return getQuestionsByCacheInfo(answerStateCache, 0, currentModuleIndex + 1);
         }
@@ -117,13 +120,13 @@ public class PilotService extends ExperimentService {
         // Return next question and next question index if the experiment is not completed
 
         //Check if current module is demographic module if it is, then we need to move on to next module
-        if (current_schedule_module.getModuleType() == ScheduleModule.ModuleType.DEMO) {
+        if (currentScheduleModule.getModuleType() == ScheduleModule.ModuleType.DEMO) {
             currentModuleIndex++;
             currentQuestionIndex = 0;
         }
 
         //If current module is not finished, continue on current module
-        if (currentQuestionIndex < current_schedule_module.getQuestionIdList().size() - 1 &&
+        if (currentQuestionIndex < currentScheduleModule.getQuestionIdList().size() - 1 &&
                 currentModuleIndex < currentModuleList.size() - 1) {
             var selectedQuestion = getQuestionsByCacheInfo(answerStateCache,
                     currentQuestionIndex + 1, currentModuleIndex);
@@ -147,6 +150,7 @@ public class PilotService extends ExperimentService {
             testeeService.saveOne(testee);
             cacheService.deleteById(session.getId());
             session.invalidate();
+            log.info("Participant:" + testee.getId() + " had finished the test");
             return null;
         }
     }
