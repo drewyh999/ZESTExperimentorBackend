@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.List;
 
-@RedisHash("AnswerStateCache")
+@RedisHash(value = "AnswerStateCache", timeToLive = 600)
 @Data
 public class AnswerStateCache {
     @Indexed
@@ -23,9 +23,15 @@ public class AnswerStateCache {
     @Indexed
     String scheduleId;
 
-    @ToString.Exclude List<BaseQuestion> currentModuleQuestionList;
+    @ToString.Exclude
+    List<BaseQuestion> currentModuleQuestionList;
 
-    public AnswerStateCache(String id, int questionIndex, int moduleIndex, String testeeId, String scheduleId, List<BaseQuestion> currentModuleQuestionList) {
+    public AnswerStateCache(String id,
+                            int questionIndex,
+                            int moduleIndex,
+                            String testeeId,
+                            String scheduleId,
+                            List<BaseQuestion> currentModuleQuestionList) {
         this.id = id;
         this.questionIndex = questionIndex;
         this.moduleIndex = moduleIndex;
@@ -34,5 +40,5 @@ public class AnswerStateCache {
         this.currentModuleQuestionList = currentModuleQuestionList;
     }
 
-    public AnswerStateCache(){}
+    public AnswerStateCache() {}
 }
