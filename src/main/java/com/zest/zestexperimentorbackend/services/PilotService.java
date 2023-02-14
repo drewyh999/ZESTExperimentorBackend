@@ -34,19 +34,19 @@ public class PilotService extends ExperimentService {
                                        List<Answer> answerList,
                                        String invitationId) throws ServiceException {
         if (session.isNew()) {
-            var questionIdList = setUp(session, Schedule.ScheduleType.PILOT, invitationId);
+            var questionIdList = setUp(session, Schedule.ScheduleType.PILOT, invitationId).get(0);
             //TODO Maybe should use a different answer cache object to store it?
             session.setAttribute("stop_count", 0);
-            var selectedQuestions = questionService.getByIdList(questionIdList);
+            var selectedQuestions = questionService.getById(questionIdList);
 
-            if (!(selectedQuestions.get(0) instanceof CodeEvaluation)) {
+            if (!(selectedQuestions instanceof CodeEvaluation)) {
                 throw new ServiceException("First module of the pilot schedule must " +
                         "be a code evaluation module and they must contains code evaluation questions");
             }
 
             //Starts with a question that has infinite exposure time
             ((CodeEvaluation) selectedQuestions).setExposureTime(-1);
-            return selectedQuestions;
+            return List.of(selectedQuestions);
         } else {
             return this.continueAnswering(session, answerList);
         }
