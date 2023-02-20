@@ -22,6 +22,10 @@ public class PilotService extends ExperimentService {
     private static final Log log = LogFactory.getLog(PilotService.class);
 
 
+    private static final String STOPPINGSTRINGLITERAL = "Cannot tell";
+
+    private static final String STOPCOUNTKEY = "stop_count";
+
     public PilotService(QuestionService questionService,
                         ScheduleService scheduleService,
                         TesteeService testeeService,
@@ -36,7 +40,7 @@ public class PilotService extends ExperimentService {
         if (session.isNew()) {
             var questionIdList = setUp(session, Schedule.ScheduleType.PILOT, invitationId).get(0);
             //TODO Maybe should use a different answer cache object to store it?
-            session.setAttribute("stop_count", 0);
+            session.setAttribute(STOPCOUNTKEY, 0);
             var selectedQuestions = questionService.getById(questionIdList);
 
             if (!(selectedQuestions instanceof CodeEvaluation)) {
@@ -101,18 +105,18 @@ public class PilotService extends ExperimentService {
 
         //If the current answer is null(Cannot tell) then we start to count consecutive、
         int stopCount = -1;
-        if (session.getAttribute("stop_count") != null) {
-            stopCount = (int) session.getAttribute("stop_count");
+        if (session.getAttribute(STOPCOUNTKEY) != null) {
+            stopCount = (int) session.getAttribute(STOPCOUNTKEY);
         }
         //TODO make the stopping string as config
-        if (answerList.get(0).getAnswerText().equals("Cannot tell")) {
+        if (answerList.get(0).getAnswerText().equals(STOPPINGSTRINGLITERAL)) {
             stopCount++;
-            session.setAttribute("stop_count", stopCount);
+            session.setAttribute(STOPCOUNTKEY, stopCount);
         } else {
-            session.setAttribute("stop_count", 0);
+            session.setAttribute(STOPCOUNTKEY, 0);
         }
         if (stopCount >= ((EarlyStoppingSchedule) schedule).getStoppingCount()) {
-            session.removeAttribute("stop_count");
+            session.removeAttribute(STOPCOUNTKEY);
             return getQuestionsByCacheInfo(answerStateCache, 0, currentModuleIndex + 1);
         }
 
@@ -127,7 +131,8 @@ public class PilotService extends ExperimentService {
 
         //If current module is not finished, continue on current module
         if (currentQuestionIndex < currentScheduleModule.getQuestionIdList().size() - 1 &&
-                currentModuleIndex < currentModuleList.size() - 1) {
+                currentModuleIndex < currentModuleList.size() - 1 &&
+                currentScheduleModule.getModuleType() != ScheduleModule.ModuleType.DEMO) {
             var selectedQuestion = getQuestionsByCacheInfo(answerStateCache,
                     currentQuestionIndex + 1, currentModuleIndex);
 

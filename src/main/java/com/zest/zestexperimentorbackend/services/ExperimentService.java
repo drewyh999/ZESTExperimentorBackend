@@ -58,7 +58,7 @@ public class ExperimentService {
     /**
      * Initialize the testee objects with all the questionIDs and null
      *
-     * @param testee            the testee to be setup
+     * @param testee           the testee to be setup
      * @param assignedSchedule the schedule that this testee is assigned to
      * @return the testee that has been initialized
      */
@@ -189,7 +189,8 @@ public class ExperimentService {
 
         //If current module is not finished, continue on current module
         if (currentQuestionIndex < currentScheduleModule.getQuestionIdList().size() - 1 &&
-                currentModuleIndex < currentModuleList.size() - 1) {
+                currentModuleIndex < currentModuleList.size() - 1 &&
+                currentScheduleModule.getModuleType() != ScheduleModule.ModuleType.DEMO) {
             return getQuestionsByCacheInfo(answerStateCache, currentQuestionIndex + 1, currentModuleIndex);
         }
         //If current module finished, continue on next module

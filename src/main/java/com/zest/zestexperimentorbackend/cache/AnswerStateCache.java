@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.List;
 
-@RedisHash(value = "AnswerStateCache", timeToLive = 600)
+@RedisHash(value = "AnswerStateCache", timeToLive = 600L)
 @Data
 public class AnswerStateCache {
     @Indexed
